@@ -1,0 +1,24 @@
+.opponent {
+  display: block;
+  width: 100%;
+
+  .color {
+    display: inline-block;
+    width: 30%;
+  }
+
+  .difficulty {
+    display: inline-block;
+    width: 50%;
+  }
+
+  .chooser {
+    display: inline-block;
+    width: 20%;
+  }
+}
+
+.serrorMessage {
+  color: red;
+  font-weight: bold;
+}
