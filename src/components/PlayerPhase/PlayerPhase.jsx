@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary';
+import * as actionTypes from '../../store/actions';
 
 import './PlayerPhase.module.scss';
 
@@ -18,6 +19,9 @@ class PlayerPhase extends Component {
     this.setState({ instructions: `Encountered the ` + alien.id + ` fleet.` });
   };
 
+  proceedHandler = () => {
+    this.props.onProceed();
+  };
   render() {
     let step;
 
@@ -40,6 +44,7 @@ class PlayerPhase extends Component {
               }
               return '';
             })}
+            <li onClick={this.proceedHandler}>No</li>
           </ul>
         </Aux>
       );
@@ -48,6 +53,9 @@ class PlayerPhase extends Component {
         1. Calculate fleet
         2. Print instructions
         */
+      step = (
+        <button onClick={this.proceedHandler}>Proceed to Econ Phase</button>
+      );
     }
 
     return (
@@ -67,4 +75,15 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(PlayerPhase);
+const mapDispatchToProps = dispatch => {
+  return {
+    onProceed: () => {
+      dispatch({ type: actionTypes.ADVANCE_PHASE });
+    }
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PlayerPhase);

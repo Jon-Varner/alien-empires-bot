@@ -18,9 +18,9 @@ class Layout extends Component {
       headline = 'Turn #' + this.props.turn.turn;
 
       if (this.props.turn.phase === 'player') {
-        headline = headline + ' :Player Phase';
+        headline = headline + ': Player Phase';
       } else {
-        headline = headline + ' :Aliens Phase';
+        headline = headline + ': Aliens Phase';
       }
     }
 
@@ -31,7 +31,7 @@ class Layout extends Component {
     let current;
 
     if (this.props.turn.turn > 0) {
-      current = <Turn />;
+      current = <Turn turn={this.props.turn} />;
     } else {
       current = <GameSettings />;
     }

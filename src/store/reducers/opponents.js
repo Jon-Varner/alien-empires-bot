@@ -1,13 +1,12 @@
 import * as actionTypes from '../actions';
 
 const initialState = {
+  cpPerTurn: 5,
   opponents: [
     {
-      id: 'red',
       color: 'red',
-      difficulty: 'easy',
-      active: true,
-      econrolls: 1,
+      econRolls: 1,
+      addRollOnTurn: 0,
       fleetcp: 0,
       techcp: 0,
       defensecp: 0,
@@ -20,14 +19,13 @@ const initialState = {
       cloaking: 0,
       attack: 0,
       defense: 0,
-      tactics: 0
+      tactics: 0,
+      fleets: []
     },
     {
-      id: 'blue',
       color: 'blue',
-      difficulty: 'easy',
-      active: true,
-      econrolls: 1,
+      econRolls: 1,
+      addRollOnTurn: 0,
       fleetcp: 0,
       techcp: 0,
       defensecp: 0,
@@ -40,14 +38,13 @@ const initialState = {
       cloaking: 0,
       attack: 0,
       defense: 0,
-      tactics: 0
+      tactics: 0,
+      fleets: []
     },
     {
-      id: 'green',
       color: 'green',
-      difficulty: 'easy',
-      active: true,
-      econrolls: 1,
+      econRolls: 1,
+      addRollOnTurn: 0,
       fleetcp: 0,
       techcp: 0,
       defensecp: 0,
@@ -60,14 +57,13 @@ const initialState = {
       cloaking: 0,
       attack: 0,
       defense: 0,
-      tactics: 0
+      tactics: 0,
+      fleets: []
     },
     {
-      id: 'yellow',
       color: 'yellow',
-      difficulty: 'easy',
-      active: false,
-      econrolls: 1,
+      econRolls: 1,
+      addRollOnTurn: 0,
       fleetcp: 0,
       techcp: 0,
       defensecp: 0,
@@ -80,13 +76,24 @@ const initialState = {
       cloaking: 0,
       attack: 0,
       defense: 0,
-      tactics: 0
+      tactics: 0,
+      fleets: []
     }
   ]
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case actionTypes.SET_DIFFICULTY:
+      return {
+        ...state,
+        cpPerTurn: action.payload.cpPerTurn
+        /*
+        Create full opponent for each in payload
+        opponents: action.payload.opponents
+        */
+      };
+
     case actionTypes.SET_ACTIVE:
       const activeOpponents = state.opponents.map(opponent => {
         if (opponent.id === action.payload.id) {
@@ -100,19 +107,18 @@ const reducer = (state = initialState, action) => {
         opponents: activeOpponents
       };
 
-    case actionTypes.SET_DIFFICULTY:
-      const difficultyOpponents = state.opponents.map(opponent => {
+    case actionTypes.SET_ECONOMY:
+      const econOpponents = state.opponents.map(opponent => {
         if (opponent.id === action.payload.id) {
-          return { ...opponent, difficulty: action.payload.value };
+          return action.payload.value;
         }
         return opponent;
       });
 
       return {
         ...state,
-        opponents: difficultyOpponents
+        opponents: econOpponents
       };
-
     default:
       return state;
   }

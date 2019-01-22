@@ -8,23 +8,102 @@ import classes from './GameSettings.module.scss';
 
 class GameSettings extends Component {
   state = {
+    cpPerTurn: 5,
+    opponents: [{ id: 0, color: 'red' }, { id: 1, color: 'blue' }],
     errorMessage: ''
   };
 
-  activeChangeHandler = event => {
-    const newValue = event.target.checked ? true : false;
+  createOpponents = count => {
+    const opponents = [];
 
-    this.props.onSetOpponentActive({
-      id: event.target.parentNode.id,
-      value: newValue
-    });
+    for (let i = 0; i < count; i++) {
+      let color = this.getUniqueColor(i);
+      console.log(i + ' : ' + color);
+      opponents.push({ id: i, color: color });
+    }
+
+    return opponents;
+  };
+
+  getOpponentCount = difficulty => {
+    switch (difficulty) {
+      case 'easy':
+      case 'hard':
+      case 'tough':
+        return 2;
+      default:
+        return 3;
+    }
+  };
+
+  getCPperTurn = difficulty => {
+    switch (difficulty) {
+      case 'hard':
+      case 'harder':
+        return 10;
+      case 'tough':
+      case 'impossible':
+        return 15;
+      default:
+        return 5;
+    }
+  };
+
+  getUniqueColor = i => {
+    switch (i) {
+      case 0:
+        return 'red';
+      case 1:
+        return 'blue';
+      case 2:
+        return 'green';
+      case 3:
+        return 'yellow';
+      default:
+        return 'red';
+    }
+  };
+
+  colorChangeHandler = event => {
+    /* Ensure each opponent has a unique color */
+    const thisColor = event.target.value;
+    const thisId = parseInt(event.target.id);
+
+    const duplicate = this.state.opponents.find(
+      opponent => opponent.color === thisColor
+    );
+
+    if (duplicate) {
+      this.setState({
+        errorMessage: 'Alien Empires must be different colors.'
+      });
+    } else {
+      const opponents = [...this.state.opponents];
+      const alien = opponents.find(opponent => opponent.id === thisId);
+      alien.color = thisColor;
+
+      this.setState({
+        opponents: opponents,
+        errorMessage: ''
+      });
+    }
   };
 
   difficultyChangeHandler = event => {
-    this.props.onSetOpponentDifficulty({
-      id: event.target.parentNode.id,
-      value: event.target.value
+    let difficulty = event.target.value;
+
+    /* Set number of opponents and set CP per turn */
+    const opponents = this.createOpponents(this.getOpponentCount(difficulty));
+
+    const cp = this.getCPperTurn(difficulty);
+
+    this.setState({
+      cpPerTurn: cp,
+      opponents: opponents,
+      errorMessage: ''
     });
+
+    //this.props.onSetDifficulty(cp);
   };
 
   startHandler = () => {
@@ -34,30 +113,35 @@ class GameSettings extends Component {
   render() {
     return (
       <Aux>
+        <select
+          classes={classes.difficulty}
+          onChange={this.difficultyChangeHandler}
+        >
+          <option value="easy">Easy</option>
+          <option value="normal">Normal</option>
+          <option value="hard">Hard</option>
+          <option value="harder">Harder</option>
+          <option value="tough">Really Tough</option>
+          <option value="impossible">Good Luck!</option>
+        </select>
         <ul>
-          {this.props.opponents.map((opponent, index) => (
-            <li classes={classes.opponent} key={index} id={opponent.id}>
-              <span classes={classes.color}>{opponent.color}</span>
-              <select
-                classes={classes.difficulty}
-                value={opponent.difficulty}
-                onChange={this.difficultyChangeHandler}
-              >
-                <option value="easy">Easy</option>
-                <option value="normal">Normal</option>
-                <option value="hard">Hard</option>
-                <option value="harder">Harder</option>
-                <option value="tough">Really Tough</option>
-                <option value="impossible">Good Luck!</option>
-              </select>
-              <input
-                type="checkbox"
-                checked={opponent.active}
-                classes={classes.chooser}
-                onChange={this.activeChangeHandler}
-              />
-            </li>
-          ))}
+          {this.state.opponents.map((opponent, index) => {
+            return (
+              <li classes={classes.opponent} key={index}>
+                <select
+                  id={opponent.id}
+                  value={opponent.color}
+                  classes={classes.color}
+                  onChange={this.colorChangeHandler}
+                >
+                  <option value="red">Red</option>
+                  <option value="blue">Blue</option>
+                  <option value="green">Green</option>
+                  <option value="yellow">Yellow</option>
+                </select>
+              </li>
+            );
+          })}
         </ul>
         <button onClick={this.startHandler}>PLAY!</button>
         <div classes={classes.errorMessage}>{this.state.errorMessage}</div>
@@ -65,13 +149,6 @@ class GameSettings extends Component {
     );
   }
 }
-
-const mapStateToProps = state => {
-  return {
-    opponents: state.opponents.opponents,
-    turn: state.turn.turn
-  };
-};
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -81,7 +158,7 @@ const mapDispatchToProps = dispatch => {
         payload: payload
       });
     },
-    onSetOpponentDifficulty: payload => {
+    onSetDifficulty: payload => {
       dispatch({
         type: actionTypes.SET_DIFFICULTY,
         payload: payload
@@ -94,6 +171,6 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(
-  mapStateToProps,
+  null,
   mapDispatchToProps
 )(GameSettings);
