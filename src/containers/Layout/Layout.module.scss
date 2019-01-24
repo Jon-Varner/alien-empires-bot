@@ -1,0 +1,31 @@
+header {
+  text-align: center;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  h1 {
+    color: #4b88c5;
+  }
+}
+
+main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px;
+
+  .red {
+    color: #e2231a;
+  }
+
+  .blue {
+    color: #0047ba;
+  }
+
+  .green {
+    color: #4cb944;
+  }
+
+  .yellow {
+    color: #ffff44;
+  }
+}

@@ -13,15 +13,10 @@ class Layout extends Component {
     let headline = '';
 
     if (this.props.turn.turn === 0) {
-      headline = 'Select Opponents';
+      headline = 'Select Alien Empires';
     } else {
-      headline = 'Turn #' + this.props.turn.turn;
-
-      if (this.props.turn.phase === 'player') {
-        headline = headline + ': Player Phase';
-      } else {
-        headline = headline + ': Aliens Phase';
-      }
+      const phase = this.props.turn.phase === 'player' ? 'Player' : 'Aliens';
+      headline = 'Turn #' + this.props.turn.turn + ': ' + phase + ' Phase';
     }
 
     return headline;

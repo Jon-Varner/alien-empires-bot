@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import Aux from '../../hoc/Auxiliary';
 import * as actionTypes from '../../store/actions';
 
 import classes from './GameSettings.module.scss';
@@ -9,23 +8,21 @@ import classes from './GameSettings.module.scss';
 class GameSettings extends Component {
   state = {
     cpPerTurn: 5,
-    opponents: [{ id: 0, color: 'red' }, { id: 1, color: 'blue' }],
-    errorMessage: ''
+    aliens: [{ id: 0, color: 'Red' }, { id: 1, color: 'Blue' }]
   };
 
-  createOpponents = count => {
-    const opponents = [];
+  createAliens = count => {
+    const aliens = [];
 
     for (let i = 0; i < count; i++) {
       let color = this.getUniqueColor(i);
-      console.log(i + ' : ' + color);
-      opponents.push({ id: i, color: color });
+      aliens.push({ id: i, color: color });
     }
 
-    return opponents;
+    return aliens;
   };
 
-  getOpponentCount = difficulty => {
+  getAlienCount = difficulty => {
     switch (difficulty) {
       case 'easy':
       case 'hard':
@@ -52,39 +49,36 @@ class GameSettings extends Component {
   getUniqueColor = i => {
     switch (i) {
       case 0:
-        return 'red';
+        return 'Red';
       case 1:
-        return 'blue';
+        return 'Blue';
       case 2:
-        return 'green';
+        return 'Green';
       case 3:
-        return 'yellow';
+        return 'Yellow';
       default:
-        return 'red';
+        return 'Red';
     }
   };
 
   colorChangeHandler = event => {
-    /* Ensure each opponent has a unique color */
+    /* Ensure each alien has a unique color */
     const thisColor = event.target.value;
     const thisId = parseInt(event.target.id);
 
-    const duplicate = this.state.opponents.find(
-      opponent => opponent.color === thisColor
+    const duplicate = this.state.aliens.find(
+      alien => alien.color === thisColor
     );
 
     if (duplicate) {
-      this.setState({
-        errorMessage: 'Alien Empires must be different colors.'
-      });
+      /* Display error? */
     } else {
-      const opponents = [...this.state.opponents];
-      const alien = opponents.find(opponent => opponent.id === thisId);
+      const aliens = [...this.state.aliens];
+      const alien = aliens.find(alien => alien.id === thisId);
       alien.color = thisColor;
 
       this.setState({
-        opponents: opponents,
-        errorMessage: ''
+        aliens: aliens
       });
     }
   };
@@ -92,29 +86,53 @@ class GameSettings extends Component {
   difficultyChangeHandler = event => {
     let difficulty = event.target.value;
 
-    /* Set number of opponents and set CP per turn */
-    const opponents = this.createOpponents(this.getOpponentCount(difficulty));
+    /* Set number of aliens and set CP per turn */
+    const aliens = this.createAliens(this.getAlienCount(difficulty));
 
     const cp = this.getCPperTurn(difficulty);
 
     this.setState({
       cpPerTurn: cp,
-      opponents: opponents,
-      errorMessage: ''
+      aliens: aliens
     });
-
-    //this.props.onSetDifficulty(cp);
   };
 
   startHandler = () => {
-    this.props.onStart();
+    /* Add all the extra empty properties */
+
+    const aliens = this.state.aliens.map(alien => ({
+      ...alien,
+      econRolls: 0,
+      extraRollOnTurn: [1],
+      fleetcp: 0,
+      techcp: 0,
+      defensecp: 0,
+      movement: 1,
+      pointDefense: 0,
+      minesweeper: 0,
+      scanners: 0,
+      shipSize: 1,
+      fighters: 0,
+      cloaking: 0,
+      attack: 0,
+      defense: 0,
+      tactics: 0,
+      fleets: []
+    }));
+
+    this.props.onSetDifficulty({
+      cpPerTurn: this.state.cpPerTurn,
+      aliens: aliens
+    });
   };
 
   render() {
     return (
-      <Aux>
+      <div className={classes.settings}>
+        <label htmlFor="difficultySelector">Difficulty:</label>
         <select
-          classes={classes.difficulty}
+          id="difficultySelector"
+          className={classes.difficultySelector}
           onChange={this.difficultyChangeHandler}
         >
           <option value="easy">Easy</option>
@@ -124,48 +142,44 @@ class GameSettings extends Component {
           <option value="tough">Really Tough</option>
           <option value="impossible">Good Luck!</option>
         </select>
+
+        <label>Alien Empire colors:</label>
         <ul>
-          {this.state.opponents.map((opponent, index) => {
+          {this.state.aliens.map((alien, index) => {
             return (
-              <li classes={classes.opponent} key={index}>
+              <li className={classes.alien} key={index}>
                 <select
-                  id={opponent.id}
-                  value={opponent.color}
-                  classes={classes.color}
+                  id={alien.id}
+                  value={alien.color}
+                  classes={classes.colorSelector}
                   onChange={this.colorChangeHandler}
                 >
-                  <option value="red">Red</option>
-                  <option value="blue">Blue</option>
-                  <option value="green">Green</option>
-                  <option value="yellow">Yellow</option>
+                  <option value="Red">Red</option>
+                  <option value="Blue">Blue</option>
+                  <option value="Green">Green</option>
+                  <option value="Yellow">Yellow</option>
                 </select>
               </li>
             );
           })}
         </ul>
-        <button onClick={this.startHandler}>PLAY!</button>
-        <div classes={classes.errorMessage}>{this.state.errorMessage}</div>
-      </Aux>
+        <button onClick={this.startHandler}>PLAY</button>
+      </div>
     );
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    onSetOpponentActive: payload => {
-      dispatch({
-        type: actionTypes.SET_ACTIVE,
-        payload: payload
-      });
-    },
     onSetDifficulty: payload => {
       dispatch({
         type: actionTypes.SET_DIFFICULTY,
         payload: payload
       });
-    },
-    onStart: () => {
-      dispatch({ type: actionTypes.START_GAME });
+
+      dispatch({
+        type: actionTypes.START_GAME
+      });
     }
   };
 };

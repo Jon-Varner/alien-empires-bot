@@ -7,51 +7,169 @@ import * as actionTypes from '../../store/actions';
 import './AlienPhase.module.scss';
 
 class AlienPhase extends Component {
-  state = {
-    instructions: ``
-  };
-
   /* the game always uses a single 10-sided die */
   rollDie = () => {
     return Math.floor(Math.random() * Math.floor(11));
   };
 
-  allocateCP = roll => {
-    /* update this alien's CP in state */
-  };
-
   render() {
-    const turn = this.props.turn.turn;
-    const aliens = this.props.opponents;
+    const turn = this.props.turn;
     const player = this.props.player;
+    const aliens = [...this.props.aliens];
+    const cp = this.props.cpPerTurn;
 
-    let totalRolls = 1;
-    let econRoll = 0;
-    let fleetRoll = 0;
-    let currentRoll = 0;
+    let instructions = ``;
+    let fleetLaunchTarget = 0;
     let launchModifier = 0;
     let raider = false;
+    let currentRoll = 0;
 
     /* For each alien: */
+    for (let i = 0; i < aliens.length; i++) {
+      const alien = aliens[i];
 
-    /*
-      1. Do econ roll
-    */
-    currentRoll = this.rollDie();
+      /* Always add an econ roll on these turns */
+      const addedRolls = [3, 6, 10, 15];
+      if (addedRolls.includes(turn)) {
+        alien.econRolls += 1;
+      }
 
-    switch (turn) {
-      case 1:
-        if (currentRoll < 3) {
-          /* alien.addRollOnTurn = 4 */
-        } else {
-          /* alien */
+      /* See if an extra roll was added for this turn */
+      if (alien.extraRollOnTurn.includes(turn)) {
+        alien.econRolls += 1;
+      }
+
+      /* For each econ roll, allocate CPs according to the rules schedule */
+
+      for (let i = 0; i < alien.econRolls; i++) {
+        currentRoll = this.rollDie();
+
+        switch (turn) {
+          case 1:
+            if (currentRoll < 3) {
+              alien.extraRollOnTurn.push(4);
+            } else {
+              alien.techcp += cp;
+            }
+            break;
+          case 2:
+            if (currentRoll < 2) {
+              alien.extraRollOnTurn.push(5);
+            } else if (currentRoll < 4) {
+              alien.fleetcp += cp;
+            } else {
+              alien.techcp += cp;
+            }
+            break;
+          case 3:
+            if (currentRoll < 2) {
+              alien.extraRollOnTurn.push(6);
+            } else if (currentRoll < 5) {
+              alien.fleetcp += cp;
+            } else if (currentRoll < 9) {
+              alien.techcp += cp;
+            } else {
+              alien.defcp += cp;
+            }
+            break;
+          case 4:
+            if (currentRoll < 2) {
+              alien.extraRollOnTurn.push(7);
+            } else if (currentRoll < 6) {
+              alien.fleetcp += cp;
+            } else if (currentRoll < 9) {
+              alien.techcp += cp;
+            } else {
+              alien.defcp += cp;
+            }
+            break;
+          case 5:
+            if (currentRoll < 2) {
+              alien.extraRollOnTurn.push(8);
+            } else if (currentRoll < 6) {
+              alien.fleetcp += cp;
+            } else if (currentRoll < 10) {
+              alien.techcp += cp;
+            } else {
+              alien.defcp += cp;
+            }
+            break;
+          case 6:
+            if (currentRoll < 2) {
+              alien.extraRollOnTurn.push(9);
+            } else if (currentRoll < 7) {
+              alien.fleetcp += cp;
+            } else if (currentRoll < 10) {
+              alien.techcp += cp;
+            } else {
+              alien.defcp += cp;
+            }
+            break;
+          case 7:
+          case 8:
+          case 9:
+            if (currentRoll < 6) {
+              alien.fleetcp += cp;
+            } else if (currentRoll < 10) {
+              alien.techcp += cp;
+            } else {
+              alien.defcp += cp;
+            }
+            break;
+          case 10:
+          case 11:
+          case 12:
+            if (currentRoll < 7) {
+              alien.fleetcp += cp;
+            } else if (currentRoll < 10) {
+              alien.techcp += cp;
+            } else {
+              alien.defcp += cp;
+            }
+            break;
+          case 13:
+          case 14:
+            if (currentRoll < 7) {
+              alien.fleetcp += cp;
+            } else {
+              alien.techcp += cp;
+            }
+            break;
+          case 15:
+          case 16:
+            if (currentRoll < 8) {
+              alien.fleetcp += cp;
+            } else {
+              alien.techcp += cp;
+            }
+            break;
+          case 17:
+          case 18:
+            if (currentRoll < 9) {
+              alien.fleetcp += cp;
+            } else {
+              alien.techcp += cp;
+            }
+            break;
+          default:
+            if (currentRoll < 10) {
+              alien.fleetcp += cp;
+            } else {
+              alien.techcp += cp;
+            }
         }
-      default:
-    }
-    /*
-    2. Allocate CPs
-    3. GOTO 1
-    4. alien.fleetcp > 5 ? GOTO 6 : 
+      }
+
+      instructions = instructions + `CPs added for ${alien.color} alien.`;
+
+      /* Don't attempt to launch a fleet unless the minimum CPs are available */
+
+      if (alien.fleetcp > 5) {
+      } else {
+        instructions =
+          instructions + `${alien.color} alien does not launch a fleet.`;
+      }
+      /*
     6. player.fighters > 0 GOTO 7 : GOTO 10
     7. player.pointDefense < alien.fighters GOTO 8 : GOTO 10
     8. alien.fleetcp > 25 GOTO 9 : GOTO 10
@@ -68,23 +186,29 @@ class AlienPhase extends Component {
     18. roll for move tech = success ? GOTO 19 : GOTO 20
     19. alien.techcp > required ? alien.movement+1 then subtract alien.techcp then GOTO 20
     20. ADVANCE
-
     */
+    }
 
-    return <Aux>{this.state.instructions}</Aux>;
+    console.log(aliens);
+    return <Aux>{instructions}</Aux>;
   }
 }
 
 const mapStateToProps = state => {
   return {
-    opponents: state.opponents.opponents,
+    cpPerTurn: state.aliens.cpPerTurn,
+    aliens: state.aliens.aliens,
     player: state.player.player,
-    turn: state.turn.turn
+    turn: state.turn.turn,
+    phase: state.turn.phase
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
+    onUpdateAlien: () => {
+      dispatch({ type: actionTypes.UPDATE_ALIEN });
+    },
     onProceed: () => {
       dispatch({ type: actionTypes.ADVANCE_PHASE });
     }

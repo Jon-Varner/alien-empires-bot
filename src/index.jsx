@@ -6,22 +6,21 @@ import { Provider } from 'react-redux';
 import App from './App';
 import turnReducer from './store/reducers/turn';
 import playerReducer from './store/reducers/player';
-import opponentsReducer from './store/reducers/opponents';
+import aliensReducer from './store/reducers/aliens';
 
 import './index.scss';
 
 const rootReducer = combineReducers({
   turn: turnReducer,
   player: playerReducer,
-  opponents: opponentsReducer
+  aliens: aliensReducer
 });
 
 const store = createStore(rootReducer);
-const rootElement = document.getElementById('root');
 
 render(
   <Provider store={store}>
     <App />
   </Provider>,
-  rootElement
+  document.getElementById('root')
 );

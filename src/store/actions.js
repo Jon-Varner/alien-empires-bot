@@ -1,5 +1,5 @@
 export const START_GAME = 'START_GAME';
-export const SET_ACTIVE = 'SET_ACTIVE';
 export const SET_DIFFICULTY = 'SET_DIFFICULTY';
-export const SET_ECONOMY = 'SET_ECONOMY';
+export const UPDATE_ALIEN = 'UPDATE_ALIEN';
+export const UPDATE_PLAYER_TECH = 'UPDATE_PLAYER_TECH';
 export const ADVANCE_PHASE = 'ADVANCE_PHASE';

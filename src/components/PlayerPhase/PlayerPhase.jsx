@@ -12,9 +12,7 @@ class PlayerPhase extends Component {
   };
 
   fleetEncounteredHandler = event => {
-    const alien = this.props.opponents.find(
-      opponent => opponent.id === event.target.id
-    );
+    const alien = this.props.aliens.find(alien => alien.id === event.target.id);
 
     this.setState({ instructions: `Encountered the ` + alien.id + ` fleet.` });
   };
@@ -30,15 +28,15 @@ class PlayerPhase extends Component {
         <Aux>
           <p>Did you encounter an alien fleet?</p>
           <ul>
-            {this.props.opponents.map((opponent, index) => {
-              if (opponent.active) {
+            {this.props.aliens.map((alien, index) => {
+              if (alien.active) {
                 return (
                   <li
                     key={index}
-                    id={opponent.id}
+                    id={alien.id}
                     onClick={this.fleetEncounteredHandler}
                   >
-                    {opponent.color}
+                    {alien.color}
                   </li>
                 );
               }
@@ -69,7 +67,7 @@ class PlayerPhase extends Component {
 
 const mapStateToProps = state => {
   return {
-    opponents: state.opponents.opponents,
+    aliens: state.aliens.aliens,
     player: state.player.player,
     turn: state.turn.turn
   };
