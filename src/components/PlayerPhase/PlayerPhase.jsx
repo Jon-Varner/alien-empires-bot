@@ -4,11 +4,26 @@ import { connect } from 'react-redux';
 import Aux from '../../hoc/Auxiliary';
 import * as actionTypes from '../../store/actions';
 
-import './PlayerPhase.module.scss';
+import classes from './PlayerPhase.module.scss';
 
 class PlayerPhase extends Component {
   state = {
-    instructions: ``
+    instructions: []
+  };
+
+  getAlienClass = color => {
+    switch (color) {
+      case 'red':
+        return classes.red;
+      case 'blue':
+        return classes.blue;
+      case 'green':
+        return classes.green;
+      case 'yellow':
+        return classes.yellow;
+      default:
+        return classes.red;
+    }
   };
 
   fleetEncounteredHandler = event => {
@@ -23,26 +38,28 @@ class PlayerPhase extends Component {
   render() {
     let step;
 
-    if (this.state.instructions === '') {
+    if (this.state.instructions.length === 0) {
       step = (
         <Aux>
           <p>Did you encounter an alien fleet?</p>
           <ul>
             {this.props.aliens.map((alien, index) => {
-              if (alien.active) {
-                return (
-                  <li
-                    key={index}
-                    id={alien.id}
-                    onClick={this.fleetEncounteredHandler}
-                  >
-                    {alien.color}
-                  </li>
-                );
-              }
-              return '';
+              const alienClass = this.getAlienClass(alien.color);
+
+              return (
+                <li
+                  key={index}
+                  id={alien.id}
+                  onClick={this.fleetEncounteredHandler}
+                  className={alienClass}
+                >
+                  {alien.color}
+                </li>
+              );
             })}
-            <li onClick={this.proceedHandler}>No</li>
+            <li className={classes.no} onClick={this.proceedHandler}>
+              No
+            </li>
           </ul>
         </Aux>
       );
@@ -57,10 +74,10 @@ class PlayerPhase extends Component {
     }
 
     return (
-      <Aux>
+      <div className={classes.instructions}>
         {step}
         <p>{this.state.instructions}</p>
-      </Aux>
+      </div>
     );
   }
 }

@@ -1,5 +1,5 @@
 export const START_GAME = 'START_GAME';
 export const SET_DIFFICULTY = 'SET_DIFFICULTY';
-export const UPDATE_ALIEN = 'UPDATE_ALIEN';
+export const UPDATE_ALIENS = 'UPDATE_ALIENS';
 export const UPDATE_PLAYER_TECH = 'UPDATE_PLAYER_TECH';
 export const ADVANCE_PHASE = 'ADVANCE_PHASE';

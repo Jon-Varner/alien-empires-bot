@@ -1,32 +1,48 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import Aux from '../../hoc/Auxiliary';
 import * as actionTypes from '../../store/actions';
 
-import './AlienPhase.module.scss';
+import classes from './AlienPhase.module.scss';
 
 class AlienPhase extends Component {
+  state = {
+    aliens: [],
+    instructions: []
+  };
+
   /* the game always uses a single 10-sided die */
   rollDie = () => {
     return Math.floor(Math.random() * Math.floor(11));
   };
 
-  render() {
-    const turn = this.props.turn;
-    const player = this.props.player;
-    const aliens = [...this.props.aliens];
-    const cp = this.props.cpPerTurn;
+  getAlienClass = color => {
+    switch (color) {
+      case 'red':
+        return classes.red;
+      case 'blue':
+        return classes.blue;
+      case 'green':
+        return classes.green;
+      case 'yellow':
+        return classes.yellow;
+      default:
+        return classes.red;
+    }
+  };
 
-    let instructions = ``;
+  getInstructions = (turn, player, aliens, cp) => {
+    let instructions = [];
     let fleetLaunchTarget = 0;
     let launchModifier = 0;
     let raider = false;
+    let fleetLaunched = false;
     let currentRoll = 0;
 
     /* For each alien: */
     for (let i = 0; i < aliens.length; i++) {
       const alien = aliens[i];
+      const alienClass = this.getAlienClass(alien.color);
 
       /* Always add an econ roll on these turns */
       const addedRolls = [3, 6, 10, 15];
@@ -160,37 +176,178 @@ class AlienPhase extends Component {
         }
       }
 
-      instructions = instructions + `CPs added for ${alien.color} alien.`;
-
       /* Don't attempt to launch a fleet unless the minimum CPs are available */
 
       if (alien.fleetcp > 5) {
+        if (
+          player.fighters > 0 &&
+          player.pointDefense > alien.fighters &&
+          alien.fleetcp > 24
+        ) {
+          launchModifier = 2;
+        }
+
+        if (
+          player.cloaking > 0 &&
+          player.scanners < alien.cloaking &&
+          alien.fleetcp > 11
+        ) {
+          launchModifier += 2;
+          raider = true;
+          console.log('launch a raider fleet.');
+        }
+
+        /* Find the target roll based on the current turn # */
+        switch (turn) {
+          case 2:
+          case 3:
+          case 14:
+          case 16:
+          case 18:
+          case 20:
+            fleetLaunchTarget = 10;
+            break;
+          case 4:
+          case 9:
+          case 10:
+            fleetLaunchTarget = 5;
+            break;
+          case 5:
+          case 11:
+          case 12:
+          case 13:
+          case 15:
+          case 17:
+          case 19:
+            fleetLaunchTarget = 3;
+            break;
+          case 6:
+          case 7:
+          case 8:
+            fleetLaunchTarget = 4;
+            break;
+          default:
+            fleetLaunchTarget = 0;
+        }
+
+        /* Subtract roll modifier */
+
+        currentRoll = this.rollDie();
+
+        console.log('launch target=' + fleetLaunchTarget);
+        console.log('launch roll = ' + currentRoll);
+        console.log('launch modifier = ' + launchModifier);
+
+        currentRoll -= launchModifier;
+
+        console.log('modified roll =' + currentRoll);
+
+        if (currentRoll <= fleetLaunchTarget) {
+          /* Build a fleet of all affordable raiders or make the fleet's CP for later */
+
+          if (raider) {
+            console.log('build a raider fleet');
+            const numberOfRaiders = Math.floor(alien.fleetcp / 12);
+            alien.fleetcp -= numberOfRaiders * 12;
+
+            instructions.push(
+              <li>
+                <span className={alienClass}>{alien.color}</span> alien launches
+                a fleet of {numberOfRaiders} raiders.
+              </li>
+            );
+          } else {
+            const fleetID = alien.fleets.length + 1;
+            alien.fleets.push({ id: fleetID, cp: alien.fleetcp });
+            alien.fleetcp = 0;
+
+            instructions.push(
+              <li>
+                <span className={alienClass}>{alien.color}</span> alien launches
+                Fleet #{fleetID}.
+              </li>
+            );
+          }
+          fleetLaunched = true;
+        } else {
+          instructions.push(
+            <li>
+              <span className={alienClass}>{alien.color}</span> alien does not
+              launch a fleet.
+            </li>
+          );
+        }
       } else {
-        instructions =
-          instructions + `${alien.color} alien does not launch a fleet.`;
+        instructions.push(
+          <li>
+            <span className={alienClass}>{alien.color}</span> alien does not
+            launch a fleet.
+          </li>
+        );
       }
-      /*
-    6. player.fighters > 0 GOTO 7 : GOTO 10
-    7. player.pointDefense < alien.fighters GOTO 8 : GOTO 10
-    8. alien.fleetcp > 25 GOTO 9 : GOTO 10
-    9. launchModifier+2 then GOTO 10
-    10. player.cloaking > 0 ? GOTO 11 : GOTO 14
-    11. player.scanners < alien.cloaking ? GOTO 12 : GOTO 14
-    12. alien.fleetcp > 11 ? GOTO 13 : GOTO 14
-    13. launchModifier+2 AND raider=true GOTO 14
-    14. random roll within turn.fleetroll range - launchModifier
-        ? success GOTO 15 : GOTO
-    15. raider=true ? GOTO 17 : GOTO 16
-    16. alien.fleets push alien.fleetcp then alien.fleetcp=0 then GOTO 18
-    17. instructions += "Add X raiders" X = all affordable with alien.fleetcp then subtract alien.fleetcp then GOTO 18
-    18. roll for move tech = success ? GOTO 19 : GOTO 20
-    19. alien.techcp > required ? alien.movement+1 then subtract alien.techcp then GOTO 20
-    20. ADVANCE
-    */
+
+      /* See if the alien will research movement tech */
+      if (fleetLaunched) {
+        if (alien.movement < 7) {
+          currentRoll = this.rollDie();
+
+          if (currentRoll < 5) {
+            let targetMoveCP = 0;
+
+            if (
+              alien.movement === 1 ||
+              alien.movement === 5 ||
+              alien.movement === 6
+            ) {
+              targetMoveCP = 20;
+            } else {
+              targetMoveCP = 25;
+            }
+
+            if (alien.techcp > targetMoveCP) {
+              alien.movement += 1;
+              alien.techcp -= targetMoveCP;
+            }
+          }
+        }
+      }
     }
 
-    console.log(aliens);
-    return <Aux>{instructions}</Aux>;
+    this.setState({
+      aliens: aliens
+    });
+
+    return instructions;
+  };
+
+  advanceHandler = () => {
+    this.props.onUpdateAliens({
+      aliens: this.state.aliens
+    });
+  };
+
+  componentDidMount() {
+    const instructions = this.getInstructions(
+      this.props.turn,
+      this.props.player,
+      [...this.props.aliens],
+      this.props.cpPerTurn
+    );
+
+    this.setState({ instructions: instructions });
+  }
+
+  render() {
+    return (
+      <div className={classes.instructions}>
+        <ol>
+          {this.state.instructions.map((item, index) => (
+            <React.Fragment key={index}>{item}</React.Fragment>
+          ))}
+        </ol>
+        <button onClick={this.advanceHandler}>END TURN</button>
+      </div>
+    );
   }
 }
 
@@ -206,11 +363,15 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onUpdateAlien: () => {
-      dispatch({ type: actionTypes.UPDATE_ALIEN });
-    },
-    onProceed: () => {
-      dispatch({ type: actionTypes.ADVANCE_PHASE });
+    onUpdateAliens: payload => {
+      dispatch({
+        type: actionTypes.UPDATE_ALIENS,
+        payload: payload
+      });
+
+      dispatch({
+        type: actionTypes.ADVANCE_PHASE
+      });
     }
   };
 };

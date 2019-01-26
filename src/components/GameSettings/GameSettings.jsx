@@ -8,7 +8,7 @@ import classes from './GameSettings.module.scss';
 class GameSettings extends Component {
   state = {
     cpPerTurn: 5,
-    aliens: [{ id: 0, color: 'Red' }, { id: 1, color: 'Blue' }]
+    aliens: [{ id: 0, color: 'red' }, { id: 1, color: 'blue' }]
   };
 
   createAliens = count => {
@@ -49,15 +49,15 @@ class GameSettings extends Component {
   getUniqueColor = i => {
     switch (i) {
       case 0:
-        return 'Red';
+        return 'red';
       case 1:
-        return 'Blue';
+        return 'blue';
       case 2:
-        return 'Green';
+        return 'green';
       case 3:
-        return 'Yellow';
+        return 'yellow';
       default:
-        return 'Red';
+        return 'red';
     }
   };
 
@@ -154,10 +154,10 @@ class GameSettings extends Component {
                   classes={classes.colorSelector}
                   onChange={this.colorChangeHandler}
                 >
-                  <option value="Red">Red</option>
-                  <option value="Blue">Blue</option>
-                  <option value="Green">Green</option>
-                  <option value="Yellow">Yellow</option>
+                  <option value="red">Red</option>
+                  <option value="blue">Blue</option>
+                  <option value="green">Green</option>
+                  <option value="yellow">Yellow</option>
                 </select>
               </li>
             );

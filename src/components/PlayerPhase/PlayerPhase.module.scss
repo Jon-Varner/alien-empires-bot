@@ -1,3 +1,66 @@
-li {
-  cursor: pointer;
+.instructions {
+  text-align: center;
+  margin: auto;
+
+  ul {
+    max-width: 250px;
+    margin: auto;
+    padding: 0;
+    list-style: none;
+
+    li {
+      text-align: center;
+      margin-bottom: 10px;
+      cursor: pointer;
+      text-transform: capitalize;
+      cursor: pointer;
+      color: white;
+      border: 2px solid white;
+      font-size: 30px;
+      font-family: 'Audiowide', cursive;
+      font-weight: normal;
+      text-transform: uppercase;
+      width: 250px;
+      padding: 10px;
+      margin-top: 20px;
+
+      &.red {
+        color: #e2231a;
+        border: 2px solid #e2231a;
+      }
+
+      &.blue {
+        color: #0047ba;
+        border: 2px solid #0047ba;
+      }
+
+      &.green {
+        color: #4cb944;
+        border: 2px solid #4cb944;
+      }
+
+      &.yellow {
+        color: #ffff44;
+        border: 2px solid #ffff44;
+      }
+
+      &.no {
+        background-color: #4b88c5;
+      }
+    }
+  }
+
+  button {
+    cursor: pointer;
+    color: white;
+    background-color: #4b88c5;
+    border: 2px solid white;
+    font-size: 30px;
+    font-family: 'Audiowide', cursive;
+    font-weight: normal;
+    text-transform: uppercase;
+    width: 250px;
+    padding: 10px;
+    margin-top: 20px;
+  }
 }
