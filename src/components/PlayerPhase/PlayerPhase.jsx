@@ -88,64 +88,94 @@ class PlayerPhase extends Component {
                 case minesweeper:
                   IF (alien.minesweeper > 1 || alien.techcp < mine sweeper cost [10||15]) THEN reroll ELSE alien.minesweeper += 1 && alien.techcp -= [10||15]
       13. IF raider fleet,
-            const numberOfRaiders = Math.floor(alien.fleetcp / 12);
-            alien.fleetcp -= numberOfRaiders * 12;
+            const numberOfRaiders = Math.floor(fleet.cp / 12);
+            fleet.cp -= numberOfRaiders * 12;
             instructions.push('add numberOfRaiders');
             GOTO END
-      14. IF (alien.fleetcp > 27 && alien.fighters > 0 && (player.pointDefense === 0 || dieRoll < 5))
+      14. IF (fleet.cp > 27 && alien.fighters > 0 && (player.pointDefense === 0 || dieRoll < 5))
             carrierFleet = true
-            alien.fleetcp -= 27
+            fleet.cp -= 27
             instructions.push('Add a carrier and 3 fighters to fleet')
             GOTO 14 until false
             GOTO 15
-      15. IF (!carrierFleet && alien.cloaking > player.scanners && alien.fleetcp > 11 )
-            const numberOfRaiders = Math.floor(alien.fleetcp / 12);
-            alien.fleetcp -= numberOfRaiders * 12;
+      15. IF (!carrierFleet && alien.cloaking > player.scanners && fleet.cp > 11 )
+            const numberOfRaiders = Math.floor(fleet.cp / 12);
+            fleet.cp -= numberOfRaiders * 12;
             instructions.push('add numberOfRaiders');
             GOTO END
           ELSE GOTO 16
-      16. IF (alien.fleetcp > 23) 
-            IF (alien.shipSize > 2) 
-              alien.fleetcp -= 24
-              instructions.push('add a Dreadnaught');
-            ELSE IF (alien.shipSize > 1)           
-              alien.fleetcp -= 15
-              instructions.push('add a Battlecruiser');   
-            ELSE
-              alien.fleetcp -= 9
-              instructions.push('add a Destroyer');               
-          ELSE IF (alien.fleetcp > 19)
-            IF (alien.shipSize > 2)           
-              alien.fleetcp -= 20
-              instructions.push('add a Battleship');            
-            ELSE IF (alien.shipSize > 1)           
-              alien.fleetcp -= 15
-              instructions.push('add a Battlecruiser');   
-            ELSE
-              alien.fleetcp -= 9
+      16. IF (alien.shipSize > 5 && fleet.cp > 23) 
+            fleet.cp -= 24
+            instructions.push('add a Dreadnaught');
+          ELSE IF (alien.shipSize > 4 && fleet.cp > 19) 
+            fleet.cp -= 20
+            instructions.push('add a Battleship');   
+          ELSE IF (alien.shipSize > 3 && fleet.cp > 14) 
+            fleet.cp -= 15
+            instructions.push('add a Battlecruiser');   
+          ELSE IF (alien.shipSize > 2 && fleet.cp > 11)
+            fleet.cp -= 12
+            instructions.push('add a Cruiser');   
+          ELSE IF (alien.shipSize > 1 && fleet.cp > 8)
+              fleet.cp -= 9
               instructions.push('add a Destroyer'); 
-          ELSE IF (alien.fleetcp > 14)
-            IF (alien.shipSize > 1)           
-              alien.fleetcp -= 15
-              instructions.push('add a Battlecruiser');   
-            ELSE
-              alien.fleetcp -= 9
-              instructions.push('add a Destroyer'); 
-          ELSE IF (alien.fleetcp > 11)
-            IF (alien.shipSize > 1)           
-              alien.fleetcp -= 12
-              instructions.push('add a Cruiser');   
-            ELSE
-              alien.fleetcp -= 9
-              instructions.push('add a Destroyer');                
-          ELSE IF (alien.fleetcp > 8)
-              alien.fleetcp -= 9
-              instructions.push('add a Destroyer');   
+              destroyerBuilt = true
           ELSE
-              alien.fleetcp -= 6
+              fleet.cp -= 6
               instructions.push('add a Scout');  
-      17. 
+      17. IF (alien.scanners >= player.cloaking && destroyerBuilt===false && fleet.cp > 8)
+            fleet.cp -= 9
+            instructions.push('add a Destroyer');
+      18. IF (dieRoll < 4) THEN largest fleet 
+          ELSE IF (dieRoll < 7) THEN balanced
+          ELSE largest ships
+      19. IF (player.fighters > 0 && alien.pointDefense > 0 && (above dieRoll-2 > 3 ) && !carrierFleet && fleet.cp > 11)
+          fleet.cp -= 12
+          instructions.push('add 2 Scouts');
+      20. IF (largest fleet)
+            UNTIL (fleet.cp < 10)
+              fleet.cp -= 6;
+              instructions.push('add a Scout');
+            THEN IF (fleet.cp===9)
+                fleet.cp -= 9;
+                instructions.push('add a Destroyer');
+              ELSE
+                fleet.cp -= 6;
+                instructions.push('add a Scout');
+      21. ELSE IF (largest ships)
+            UNTIL (fleet.cp < 6)                        
+              GOTO 16
+      22. ELSE 
+            IF (alien.attack > 2 || alien.defense > 2)
+              GOTO 16
+            ELSE IF (alien.attack > 1 || alien.defense > 1)
+              GOTO 23
+            ELSE 
+              GOTO 24              
+      23. CALCULATE fleet composition for maximum cost effectiveness
+          NO DREADNAUGHTS OR BATTLESHIPS
+      24. CALCULATE fleet composition for maximum cost effectiveness
+          DESTROYERS AND SCOUTS ONLY
+      25. alien.fleetcp += remaining fleet.cp
+        alien.fleets(splice this fleet)
+      26. IF (alien.minesweeper > 0) 
+        instructions.push('This alien scouts have minesweeping');
     */
+    this.setState({ instructions: instructions });
+  };
+
+  homeworldAttackedHandler = (alienId, color, alienClass) => {
+    const instructions = [];
+    const cp = 0;
+
+    /* Look up this alien ID and return its defensecp */
+
+    instructions.push(
+      <li>
+        <span className={alienClass}>{color}</span> has defense of {cp}.
+      </li>
+    );
+
     this.setState({ instructions: instructions });
   };
 
@@ -181,7 +211,7 @@ class PlayerPhase extends Component {
 
       step = (
         <Aux>
-          <p>Did you encounter an alien fleet?</p>
+          <p>Did you encounter an unbuilt alien fleet?</p>
           <ul>
             {allFleets.map((fleet, index) => {
               return (
@@ -197,6 +227,30 @@ class PlayerPhase extends Component {
                     className={fleet.class}
                   >
                     {fleet.color} Fleet #{fleet.fleetId}
+                  </button>
+                </li>
+              );
+            })}
+            <li>
+              <button className={classes.no} onClick={this.proceedHandler}>
+                No
+              </button>
+            </li>
+          </ul>
+          <p>Did you attack an alien homeworld?</p>
+          <ul>
+            {this.state.aliens.map((alien, index) => {
+              return (
+                <li key={index}>
+                  <button
+                    onClick={this.homeworldAttackedHandler(
+                      alien.id,
+                      alien.color,
+                      alien.class
+                    )}
+                    className={fleet.class}
+                  >
+                    {alien.color}
                   </button>
                 </li>
               );
