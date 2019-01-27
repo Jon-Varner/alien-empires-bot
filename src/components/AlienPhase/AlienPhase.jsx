@@ -188,13 +188,12 @@ class AlienPhase extends Component {
         }
 
         if (
-          player.cloaking > 0 &&
+          alien.cloaking > 0 &&
           player.scanners < alien.cloaking &&
           alien.fleetcp > 11
         ) {
           launchModifier += 2;
           raider = true;
-          console.log('launch a raider fleet.');
         }
 
         /* Find the target roll based on the current turn # */

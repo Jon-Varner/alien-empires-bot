@@ -117,6 +117,7 @@ class GameSettings extends Component {
       attack: 0,
       defense: 0,
       tactics: 0,
+      exploration: 0,
       fleets: []
     }));
 
@@ -151,7 +152,7 @@ class GameSettings extends Component {
                 <select
                   id={alien.id}
                   value={alien.color}
-                  classes={classes.colorSelector}
+                  className={classes.colorSelector}
                   onChange={this.colorChangeHandler}
                 >
                   <option value="red">Red</option>

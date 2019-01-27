@@ -5,7 +5,9 @@ const initialState = {
     fighters: 0,
     pointDefense: 0,
     scanners: 0,
-    cloaking: 0
+    cloaking: 0,
+    mines: 0,
+    raiders: 0
   }
 };
 
