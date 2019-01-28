@@ -160,8 +160,9 @@ class PlayerPhase extends Component {
         alien.fleets(splice this fleet)
       26. IF (alien.minesweeper > 0) 
         instructions.push('This alien scouts have minesweeping');
-    */
+
     this.setState({ instructions: instructions });
+    */
   };
 
   homeworldAttackedHandler = (alienId, color, alienClass) => {
@@ -237,30 +238,33 @@ class PlayerPhase extends Component {
               </button>
             </li>
           </ul>
-          <p>Did you attack an alien homeworld?</p>
-          <ul>
-            {this.state.aliens.map((alien, index) => {
-              return (
-                <li key={index}>
-                  <button
-                    onClick={this.homeworldAttackedHandler(
-                      alien.id,
-                      alien.color,
-                      alien.class
-                    )}
-                    className={fleet.class}
-                  >
-                    {alien.color}
-                  </button>
-                </li>
-              );
-            })}
-            <li>
-              <button className={classes.no} onClick={this.proceedHandler}>
-                No
-              </button>
-            </li>
-          </ul>
+          {/* TODO: Implement homeworld defense calculation */
+          /*
+            <p>Did you attack an alien homeworld?</p>
+            <ul>
+              {this.state.aliens.map((alien, index) => {
+                return (
+                  <li key={index}>
+                    <button
+                      onClick={this.homeworldAttackedHandler(
+                        alien.id,
+                        alien.color,
+                        alien.class
+                      )}
+                      className={alien.class}
+                    >
+                      {alien.color}
+                    </button>
+                  </li>
+                );
+              })}
+              <li>
+                <button className={classes.no} onClick={this.proceedHandler}>
+                  No
+                </button>
+              </li>
+            </ul>
+            */}
         </Aux>
       );
     } else {
