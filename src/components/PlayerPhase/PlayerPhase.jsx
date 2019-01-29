@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary';
+import FleetConstruction from './FleetConstruction';
+import FleetEncounter from './FleetEncounter';
 import * as actionTypes from '../../store/actions';
 
 import classes from './PlayerPhase.module.scss';
@@ -10,30 +12,16 @@ class PlayerPhase extends Component {
   state = {
     aliens: [],
     fleets: [],
+    step: 'encounters',
     instructions: []
   };
 
-  getAlienClass = color => {
-    switch (color) {
-      case 'red':
-        return classes.red;
-      case 'blue':
-        return classes.blue;
-      case 'green':
-        return classes.green;
-      case 'yellow':
-        return classes.yellow;
-      default:
-        return classes.red;
-    }
-  };
-
-  fleetEncounteredHandler = (alienId, fleetId, fleetCp, color, alienClass) => {
+  fleetEncounteredHandler = (alienId, fleetId, fleetCp, color) => {
     const instructions = [];
 
     instructions.push(
       <li>
-        <span className={alienClass}>
+        <span className={color}>
           {color} Fleet #{fleetId}
         </span>{' '}
         is {fleetCp}.
@@ -160,12 +148,11 @@ class PlayerPhase extends Component {
         alien.fleets(splice this fleet)
       26. IF (alien.minesweeper > 0) 
         instructions.push('This alien scouts have minesweeping');
-
-    this.setState({ instructions: instructions });
     */
+    this.setState({ step: 'construction', instructions: instructions });
   };
 
-  homeworldAttackedHandler = (alienId, color, alienClass) => {
+  homeworldAttackedHandler = (alienId, color) => {
     const instructions = [];
     const cp = 0;
 
@@ -173,7 +160,7 @@ class PlayerPhase extends Component {
 
     instructions.push(
       <li>
-        <span className={alienClass}>{color}</span> has defense of {cp}.
+        <span className={color}>{color}</span> has defense of {cp}.
       </li>
     );
 
@@ -184,66 +171,22 @@ class PlayerPhase extends Component {
     this.props.onProceed();
   };
 
-  componentDidMount() {
-    const aliens = [...this.props.aliens];
-    this.setState({ aliens: aliens });
-  }
-
   render() {
     let step;
 
-    if (this.state.instructions.length === 0) {
-      const allFleets = [];
-
-      this.state.aliens.map(alien => {
-        const alienClass = this.getAlienClass(alien.color);
-        const fleets = [...alien.fleets];
-
-        fleets.map(fleet => {
-          allFleets.push({
-            color: alien.color,
-            alienId: alien.id,
-            fleetId: fleet.id,
-            fleetCp: fleet.cp,
-            class: alienClass
-          });
-        });
-      });
-
+    if (this.state.step === 'encounters') {
       step = (
         <Aux>
-          <p>Did you encounter an unbuilt alien fleet?</p>
-          <ul>
-            {allFleets.map((fleet, index) => {
-              return (
-                <li key={index}>
-                  <button
-                    onClick={this.fleetEncounteredHandler(
-                      fleet.alienId,
-                      fleet.fleetId,
-                      fleet.fleetCp,
-                      fleet.color,
-                      fleet.class
-                    )}
-                    className={fleet.class}
-                  >
-                    {fleet.color} Fleet #{fleet.fleetId}
-                  </button>
-                </li>
-              );
-            })}
-            <li>
-              <button className={classes.no} onClick={this.proceedHandler}>
-                No
-              </button>
-            </li>
-          </ul>
+          <FleetEncounter
+            aliens={this.props.aliens}
+            proceed={this.proceedHandler}
+            fleetEncountered={this.fleetEncounteredHandler}
+          />
           {/* TODO: Implement homeworld defense calculation */
           /*
             <p>Did you attack an alien homeworld?</p>
             <ul>
               {this.state.aliens.map((alien, index) => {
-                return (
                   <li key={index}>
                     <button
                       onClick={this.homeworldAttackedHandler(
@@ -256,7 +199,6 @@ class PlayerPhase extends Component {
                       {alien.color}
                     </button>
                   </li>
-                );
               })}
               <li>
                 <button className={classes.no} onClick={this.proceedHandler}>
@@ -269,14 +211,10 @@ class PlayerPhase extends Component {
       );
     } else {
       step = (
-        <Aux>
-          <ol>
-            {this.state.instructions.map((item, index) => (
-              <React.Fragment key={index}>{item}</React.Fragment>
-            ))}
-          </ol>
-          <button onClick={this.proceedHandler}>Go to Econ Phase</button>
-        </Aux>
+        <FleetConstruction
+          instructions={this.state.instructions}
+          proceedHandler={this.proceedHandler}
+        />
       );
     }
 

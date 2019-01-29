@@ -3,7 +3,7 @@
 }
 
 html {
-  font-size: 20px;
+  font-size: 10px;
 }
 
 body {
@@ -12,4 +12,49 @@ body {
   color: white;
   background-color: #333333;
   font-family: 'Open Sans', sans-serif;
+}
+
+main {
+  padding: 0;
+}
+
+button {
+  cursor: pointer;
+  color: white;
+  background-color: #333333;
+  border: 2px solid white;
+  font-size: 2rem;
+  font-family: 'Audiowide', cursive;
+  font-weight: normal;
+  text-transform: uppercase;
+  width: 250px;
+  padding: 10px;
+  margin: 20px 0 0 0;
+}
+
+ul button {
+  margin: 10px 0 0 -20px;
+}
+.red {
+  color: #e2231a;
+  border-color: #e2231a;
+}
+
+.blue {
+  color: #2e68c6;
+  border-color: #2e68c6;
+}
+
+.green {
+  color: #4cb944;
+  border-color: #4cb944;
+}
+
+.yellow {
+  color: #ffff44;
+  border-color: #ffff44;
+}
+
+.advance {
+  background-color: #5b92ca;
 }

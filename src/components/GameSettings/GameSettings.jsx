@@ -164,7 +164,9 @@ class GameSettings extends Component {
             );
           })}
         </ul>
-        <button onClick={this.startHandler}>PLAY</button>
+        <button className="advance" onClick={this.startHandler}>
+          PLAY
+        </button>
       </div>
     );
   }

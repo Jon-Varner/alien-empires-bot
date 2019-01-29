@@ -1,6 +1,7 @@
 .instructions {
   text-align: center;
   margin: auto;
+  font-size: 1.5rem;
 
   ol {
     max-width: 400px;
@@ -12,37 +13,7 @@
 
       span {
         text-transform: capitalize;
-
-        &.red {
-          color: #e2231a;
-        }
-
-        &.blue {
-          color: #0047ba;
-        }
-
-        &.green {
-          color: #4cb944;
-        }
-
-        &.yellow {
-          color: #ffff44;
-        }
       }
     }
-  }
-
-  button {
-    cursor: pointer;
-    color: white;
-    background-color: #4b88c5;
-    border: 1px solid white;
-    font-size: 30px;
-    font-family: 'Audiowide', cursive;
-    font-weight: normal;
-    text-transform: uppercase;
-    width: 250px;
-    padding: 10px;
-    margin-top: 20px;
   }
 }

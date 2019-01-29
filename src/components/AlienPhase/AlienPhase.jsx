@@ -42,7 +42,6 @@ class AlienPhase extends Component {
     /* For each alien: */
     for (let i = 0; i < aliens.length; i++) {
       const alien = aliens[i];
-      const alienClass = this.getAlienClass(alien.color);
 
       /* Always add an econ roll on these turns */
       const addedRolls = [3, 6, 10, 15];
@@ -251,8 +250,8 @@ class AlienPhase extends Component {
 
             instructions.push(
               <li>
-                <span className={alienClass}>{alien.color}</span> alien launches
-                a fleet of {numberOfRaiders} raiders.
+                <span className={alien.color}>{alien.color}</span> alien
+                launches a fleet of {numberOfRaiders} raiders.
               </li>
             );
           } else {
@@ -262,8 +261,8 @@ class AlienPhase extends Component {
 
             instructions.push(
               <li>
-                <span className={alienClass}>{alien.color}</span> alien launches
-                Fleet #{fleetID}.
+                <span className={alien.color}>{alien.color}</span> alien
+                launches Fleet #{fleetID}.
               </li>
             );
           }
@@ -271,7 +270,7 @@ class AlienPhase extends Component {
         } else {
           instructions.push(
             <li>
-              <span className={alienClass}>{alien.color}</span> alien does not
+              <span className={alien.color}>{alien.color}</span> alien does not
               launch a fleet.
             </li>
           );
@@ -279,7 +278,7 @@ class AlienPhase extends Component {
       } else {
         instructions.push(
           <li>
-            <span className={alienClass}>{alien.color}</span> alien does not
+            <span className={alien.color}>{alien.color}</span> alien does not
             launch a fleet.
           </li>
         );
@@ -344,7 +343,9 @@ class AlienPhase extends Component {
             <React.Fragment key={index}>{item}</React.Fragment>
           ))}
         </ol>
-        <button onClick={this.advanceHandler}>END TURN</button>
+        <button className="advance" onClick={this.advanceHandler}>
+          END TURN
+        </button>
       </div>
     );
   }
@@ -355,8 +356,7 @@ const mapStateToProps = state => {
     cpPerTurn: state.aliens.cpPerTurn,
     aliens: state.aliens.aliens,
     player: state.player.player,
-    turn: state.turn.turn,
-    phase: state.turn.phase
+    turn: state.turn.turn
   };
 };
 
