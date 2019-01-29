@@ -2,31 +2,50 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary';
-import FleetConstruction from './FleetConstruction';
+import Instructions from './Instructions';
 import FleetEncounter from './FleetEncounter';
+import FleetConstruction from './FleetConstruction';
+import HomeworldInvasion from './HomeworldInvasion';
+
 import * as actionTypes from '../../store/actions';
 
 import classes from './PlayerPhase.module.scss';
 
 class PlayerPhase extends Component {
   state = {
-    aliens: [],
-    fleets: [],
-    step: 'encounters',
-    instructions: []
+    step: 'fleet encounters',
+    instructions: [],
+    currentAlien: [],
+    currentFleet: []
   };
 
-  fleetEncounteredHandler = (alienId, fleetId, fleetCp, color) => {
+  fleetEncounteredHandler = (alienId, fleetId) => {
     const instructions = [];
+    const aliens = [...this.props.aliens];
+
+    /* Look up this alien ID */
+    const alien = aliens.find(alien => alien.id === alienId);
+    const fleet = alien.fleets.find(fleet => fleet.id === fleetId);
+
+    /* Mark fleet as encountered */
+    fleet.encountered = true;
 
     instructions.push(
       <li>
-        <span className={color}>
-          {color} Fleet #{fleetId}
+        <span className={alien.color}>
+          {alien.color} Fleet #{fleet.id}
         </span>{' '}
-        is {fleetCp}.
+        has {fleet.cp} CPs.
       </li>
     );
+
+    /* Display fleet construction instructions */
+    this.setState({
+      step: 'fleet construction',
+      instructions: instructions,
+      currentAlien: alien,
+      currentFleet: fleet
+    });
 
     /*
       1. What level fighters have you shown?
@@ -149,32 +168,69 @@ class PlayerPhase extends Component {
       26. IF (alien.minesweeper > 0) 
         instructions.push('This alien scouts have minesweeping');
     */
-    this.setState({ step: 'construction', instructions: instructions });
   };
 
-  homeworldAttackedHandler = (alienId, color) => {
-    const instructions = [];
-    const cp = 0;
+  fleetConstructedHandler = () => {
+    const aliens = [...this.props.aliens];
+    const alien = this.state.currentAlien;
+    const fleet = this.state.currentFleet;
 
-    /* Look up this alien ID and return its defensecp */
+    /* Return any remaining fleet CP */
+
+    alien.fleetcp += fleet.cp;
+
+    /* Update aliens with revised fleets and fleet CPs */
+
+    const fleets = [...alien.fleets];
+    let index = fleets.findIndex(item => item.id === fleet.id);
+    fleets.splice(index, 1, fleet);
+    alien.fleets = fleets;
+
+    /* return to encounter phase */
+    this.setState({
+      step: 'fleet encounters',
+      instructions: []
+    });
+
+    /* Update the alien in the aliens array and push it to Redux */
+    index = aliens.findIndex(item => item.id === alien.id);
+    aliens.splice(index, 1, alien);
+    this.props.onUpdateAliens({ aliens: aliens });
+  };
+
+  homeworldInvadedHandler = alienId => {
+    const aliens = [...this.props.aliens];
+    const instructions = [];
+
+    /* Look up this alien ID and get its defensecp */
+    const alien = aliens.find(alien => alien.id === alienId);
 
     instructions.push(
       <li>
-        <span className={color}>{color}</span> has defense of {cp}.
+        <span className={alien.color}>{alien.color}</span> has defense of{' '}
+        {alien.defenseCp}.
       </li>
     );
 
-    this.setState({ instructions: instructions });
+    this.setState({ step: 'defense construction', instructions: instructions });
   };
 
-  proceedHandler = () => {
-    this.props.onProceed();
+  proceedHandler = stage => {
+    if (stage === 'no fleet encounter') {
+      /* go to homeworld invasion */
+      this.setState({ step: 'homeworld invasions' });
+    } else if (stage === 'no homeworld invasion') {
+      /* advance to next econ phase */
+      this.props.onAdvance();
+    } else {
+    }
   };
 
   render() {
     let step;
 
-    if (this.state.step === 'encounters') {
+    if (this.state.step === 'fleet encounters') {
+      console.log('fleet encounters');
       step = (
         <Aux>
           <FleetEncounter
@@ -182,36 +238,29 @@ class PlayerPhase extends Component {
             proceed={this.proceedHandler}
             fleetEncountered={this.fleetEncounteredHandler}
           />
-          {/* TODO: Implement homeworld defense calculation */
-          /*
-            <p>Did you attack an alien homeworld?</p>
-            <ul>
-              {this.state.aliens.map((alien, index) => {
-                  <li key={index}>
-                    <button
-                      onClick={this.homeworldAttackedHandler(
-                        alien.id,
-                        alien.color,
-                        alien.class
-                      )}
-                      className={alien.class}
-                    >
-                      {alien.color}
-                    </button>
-                  </li>
-              })}
-              <li>
-                <button className={classes.no} onClick={this.proceedHandler}>
-                  No
-                </button>
-              </li>
-            </ul>
-            */}
         </Aux>
       );
-    } else {
+    } else if (this.state.step === 'fleet construction') {
+      console.log('fleet construction');
       step = (
         <FleetConstruction
+          instructions={this.state.instructions}
+          fleetConstructed={this.fleetConstructedHandler}
+        />
+      );
+    } else if (this.state.step === 'homeworld invasions') {
+      console.log('homeworld invasions');
+      step = (
+        <HomeworldInvasion
+          aliens={this.props.aliens}
+          homeworldInvaded={this.homeworldInvadedHandler}
+          proceed={this.proceedHandler}
+        />
+      );
+    } else {
+      console.log('UNHANDLED EXCEPTION');
+      step = (
+        <Instructions
           instructions={this.state.instructions}
           proceedHandler={this.proceedHandler}
         />
@@ -232,8 +281,14 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onProceed: () => {
+    onAdvance: () => {
       dispatch({ type: actionTypes.ADVANCE_PHASE });
+    },
+    onUpdateAliens: payload => {
+      dispatch({
+        type: actionTypes.UPDATE_ALIENS,
+        payload: payload
+      });
     }
   };
 };

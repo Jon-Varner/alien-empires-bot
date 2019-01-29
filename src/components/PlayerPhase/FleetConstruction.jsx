@@ -1,15 +1,19 @@
 import React from 'react';
 
 import Aux from '../../hoc/Auxiliary';
+import Instructions from './Instructions';
 
 const fleetConstruction = props => (
   <Aux>
-    <ol>
-      {props.instructions.map((item, index) => (
-        <React.Fragment key={index}>{item}</React.Fragment>
-      ))}
-    </ol>
-    <button onClick={props.proceedHandler}>Go to Econ Phase</button>
+    <Instructions instructions={props.instructions} />
+    <button
+      className="advance"
+      onClick={() => {
+        props.fleetConstructed();
+      }}
+    >
+      Proceed
+    </button>
   </Aux>
 );
 

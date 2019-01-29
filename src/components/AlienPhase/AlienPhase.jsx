@@ -256,7 +256,11 @@ class AlienPhase extends Component {
             );
           } else {
             const fleetID = alien.fleets.length + 1;
-            alien.fleets.push({ id: fleetID, cp: alien.fleetcp });
+            alien.fleets.push({
+              id: fleetID,
+              cp: alien.fleetcp,
+              encountered: false
+            });
             alien.fleetcp = 0;
 
             instructions.push(

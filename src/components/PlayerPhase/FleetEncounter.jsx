@@ -15,17 +15,15 @@ class FleetEncounter extends Component {
       const fleets = [...alien.fleets];
 
       fleets.forEach(fleet => {
-        allFleets.push({
-          color: alien.color,
-          alienId: alien.id,
-          fleetId: fleet.id,
-          fleetCp: fleet.cp
-        });
+        if (fleet.encountered === false) {
+          allFleets.push({
+            color: alien.color,
+            alienId: alien.id,
+            fleetId: fleet.id
+          });
+        }
       });
     });
-
-    console.log('All fleets=');
-    console.log(allFleets);
 
     this.setState({ fleets: allFleets });
   }
@@ -40,12 +38,7 @@ class FleetEncounter extends Component {
               <button
                 className={fleet.color}
                 onClick={() => {
-                  this.props.fleetEncountered(
-                    fleet.alienId,
-                    fleet.fleetId,
-                    fleet.fleetCp,
-                    fleet.color
-                  );
+                  this.props.fleetEncountered(fleet.alienId, fleet.fleetId);
                 }}
               >
                 {fleet.color} Fleet #{fleet.fleetId}
@@ -54,7 +47,12 @@ class FleetEncounter extends Component {
           ))}
 
           <li>
-            <button className="advance" onClick={this.props.proceed}>
+            <button
+              className="advance"
+              onClick={() => {
+                this.props.proceed('no fleet encounter');
+              }}
+            >
               No
             </button>
           </li>
