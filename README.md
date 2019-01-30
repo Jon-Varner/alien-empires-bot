@@ -1,68 +1,32 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<h1>Alien Empires Bot</h1>
 
-## Available Scripts
+<p>This app handles all of the calculations for the alien empires in the <a href="https://www.gmtgames.com/p-533-space-empires-3rd-printing.aspx">Space Empires: 4x</a> solo scenario.</p>
 
-In the project directory, you can run:
+<h2>What does it do?</h2>
 
-### `npm start`
+<p>Alien Empires Bot implements the rules outlined in the Space Empires: 4x scenario book to do all of the calculations for determining the alien empires' economies, technology research, fleet construction and (eventually) planetary defense construction.</p>
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+<p>Minimal player input is required. Just select a difficulty level, launch the alien fleets specified each turn, select the fleets you encounter each turn, update your own selected technologies, then add the alien fleets to the board as instructed.</p>
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+<p>All calculations are hidden from the user. This keeps the interface clean and simple and makes the alien empires more challenging, since you no longer see their capabilities until you encounter them in the game.</p>
 
-### `npm test`
+<h2>What doesn't it do?</h2>
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+<p>You'll still need to move the alien fleets once they have been launched. Since the spaces on the board are randomized every game, this would be nearly impossible to anticipate or enter into an app!</p>
 
-### `npm run build`
+<p>Once you encounter a fleet, you'll need to physically add the counters to the board and keep track of which alien fleets have the IDs specified by the app.</p>
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<p>And you'll still need to do your own economy and technology calculations.</p>
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+<h2>Known issues and future plans</h2>
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<ol>
+  <li>The app currently tracks the alien empires' defensive capability, but does not provide instructions for constructing those defenses when the player invades their homeworlds.</li>
+  <li>Currently, the app only constructs 4 types of fleets: Raiders, Carriers, "Biggest Ships Possible", and "Most Ships Possible". The final type of fleet, "Balanced" is a more complicated algorithm.</li>
+  <li>There is currently no way to save game state--if you refresh the page, you'll begin a new game. I may implement a database at some point, which would necessitate some form of user login.</li>
+  <li>Eventually, I might add a "verbose" mode that displays all of the "die rolls" and tech assignments. For now, I wanted to keep the experience as clean and simple as possible, so I hid all of that information.</li>
+</ol>
 
-### `npm run eject`
+<h2>What technology did you use?</h2>
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+<p>Good question! The main reason I built this app (aside from my love for Space Empires: 4x) was to gain a deeper understanding of React and Redux. Refactoring and improving the app will be an ongoing endeavor.</p>
