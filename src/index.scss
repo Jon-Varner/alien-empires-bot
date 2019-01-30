@@ -15,7 +15,11 @@ body {
 }
 
 main {
-  padding: 0;
+  text-align: center;
+  font-size: 1.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 button {
@@ -32,9 +36,14 @@ button {
   margin: 20px 0 0 0;
 }
 
-ul button {
-  margin: 10px 0 0 -20px;
+ul {
+  list-style: none;
+
+  button {
+    margin: 10px 0 0 -20px;
+  }
 }
+
 .red {
   color: #e2231a;
   border-color: #e2231a;

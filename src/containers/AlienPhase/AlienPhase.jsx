@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import * as actionTypes from '../../store/actions';
+import Aux from '../../hoc/Auxiliary';
+import Instructions from '../../components/Instructions/Instructions';
 
-import classes from './AlienPhase.module.scss';
+import * as actionTypes from '../../store/actions';
 
 class AlienPhase extends Component {
   state = {
@@ -14,21 +15,6 @@ class AlienPhase extends Component {
   /* the game always uses a single 10-sided die */
   rollDie = () => {
     return Math.floor(Math.random() * Math.floor(11));
-  };
-
-  getAlienClass = color => {
-    switch (color) {
-      case 'red':
-        return classes.red;
-      case 'blue':
-        return classes.blue;
-      case 'green':
-        return classes.green;
-      case 'yellow':
-        return classes.yellow;
-      default:
-        return classes.red;
-    }
   };
 
   getInstructions = (turn, player, aliens, cp) => {
@@ -341,16 +327,12 @@ class AlienPhase extends Component {
 
   render() {
     return (
-      <div className={classes.instructions}>
-        <ol>
-          {this.state.instructions.map((item, index) => (
-            <React.Fragment key={index}>{item}</React.Fragment>
-          ))}
-        </ol>
+      <Aux>
+        <Instructions instructions={this.state.instructions} />
         <button className="advance" onClick={this.advanceHandler}>
           END TURN
         </button>
-      </div>
+      </Aux>
     );
   }
 }

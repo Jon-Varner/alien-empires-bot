@@ -1,7 +1,7 @@
 import React from 'react';
 
-import PlayerPhase from '../PlayerPhase/PlayerPhase';
-import AlienPhase from '../AlienPhase/AlienPhase';
+import PlayerPhase from '../../containers/PlayerPhase/PlayerPhase';
+import AlienPhase from '../../containers/AlienPhase/AlienPhase';
 
 import './Turn.module.scss';
 

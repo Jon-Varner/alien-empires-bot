@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Layout from './components/Layout/Layout';
+import Layout from './containers/Layout/Layout';
 
 const app = () => <Layout />;
 

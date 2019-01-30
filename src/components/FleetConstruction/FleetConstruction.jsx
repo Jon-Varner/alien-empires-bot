@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Aux from '../../hoc/Auxiliary';
-import Instructions from './Instructions';
+import Instructions from '../Instructions/Instructions';
 
 const fleetConstruction = props => (
   <Aux>

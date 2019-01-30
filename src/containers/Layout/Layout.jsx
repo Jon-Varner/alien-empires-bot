@@ -3,10 +3,8 @@ import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary';
 import Header from '../../components/Header/Header';
-import GameSettings from '../../components/GameSettings/GameSettings';
+import GameSettings from '../../containers/GameSettings/GameSettings';
 import Turn from '../../components/Turn/Turn';
-
-import './Layout.module.scss';
 
 class Layout extends Component {
   displayHeadline = () => {

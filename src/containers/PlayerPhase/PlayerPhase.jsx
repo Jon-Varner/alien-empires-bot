@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary';
-import Instructions from './Instructions';
-import FleetEncounter from './FleetEncounter';
-import FleetConstruction from './FleetConstruction';
-import HomeworldInvasion from './HomeworldInvasion';
+import Instructions from '../../components/Instructions/Instructions';
+import FleetEncounter from '../../components/FleetEncounter/FleetEncounter';
+import PlayerTechReveal from '../../components/PlayerTechReveal/PlayerTechReveal';
+import FleetConstruction from '../../components/FleetConstruction/FleetConstruction';
+import HomeworldInvasion from '../../components/HomeworldInvasion/HomeworldInvasion';
 
 import * as actionTypes from '../../store/actions';
-
-import classes from './PlayerPhase.module.scss';
 
 class PlayerPhase extends Component {
   state = {
@@ -19,8 +18,15 @@ class PlayerPhase extends Component {
     currentFleet: []
   };
 
+  /* the game always uses a single 10-sided die */
+  rollDie = () => {
+    return Math.floor(Math.random() * Math.floor(11));
+  };
+
   fleetEncounteredHandler = (alienId, fleetId) => {
-    const instructions = [];
+    /*
+    show screen with select boxes for all player techs
+    */
     const aliens = [...this.props.aliens];
 
     /* Look up this alien ID */
@@ -30,22 +36,68 @@ class PlayerPhase extends Component {
     /* Mark fleet as encountered */
     fleet.encountered = true;
 
-    instructions.push(
-      <li>
-        <span className={alien.color}>
-          {alien.color} Fleet #{fleet.id}
-        </span>{' '}
-        has {fleet.cp} CPs.
-      </li>
-    );
-
-    /* Display fleet construction instructions */
+    /* Get latest player tech in order to correctly build the fleet */
     this.setState({
-      step: 'fleet construction',
-      instructions: instructions,
+      step: 'player tech reveal',
       currentAlien: alien,
       currentFleet: fleet
     });
+  };
+
+  playerTechUpdatedHandler = (id, value) => {
+    const player = [...this.props.player];
+
+    switch (id) {
+      case 'fightersSelector':
+        player.fighters = parseInt(value);
+        break;
+      case 'pointDefenseSelector':
+        player.pointDefense = parseInt(value);
+        break;
+      case 'cloakingSelector':
+        player.cloaking = parseInt(value);
+        break;
+      case 'scannersSelector':
+        player.scanners = parseInt(value);
+        break;
+      case 'minesSelector':
+        player.mines = parseInt(value);
+        break;
+      default:
+        break;
+    }
+
+    this.props.onUpdatePlayerTech({
+      player: player
+    });
+  };
+
+  constructFleet = () => {
+    const alien = this.state.currentAlien;
+    // const fleet = this.state.currentFleet;
+    const player = [...this.props.player];
+    let currentRoll = 0;
+
+    if (player.fighters > 0 && alien.pointDefense === 0 && alien.techcp > 19) {
+      alien.pointDefense += 1;
+      alien.techcp -= 20;
+    }
+
+    if (player.mines > 0 && alien.minesweeper === 0 && alien.techcp > 9) {
+      alien.minesweeper += 1;
+      alien.techcp -= 10;
+    }
+
+    currentRoll = this.rollDie();
+
+    while (
+      player.cloaking > alien.scanners &&
+      alien.techcp > 19 &&
+      currentRoll < 5
+    ) {
+      alien.scanners += 1;
+      alien.techcp -= 20;
+    }
 
     /*
       1. What level fighters have you shown?
@@ -53,7 +105,7 @@ class PlayerPhase extends Component {
       3. What level mines have you shown?
       4. IF player.mines > 0 && alien.minesweeper === 0 THEN alien.minesweeper += 1 && alien.techcp -= 10
       5. What level raiders have you used in combat?
-      6. IF player.raiders > alien.scanners && dieRoll < 5 THEN (alien.scanners += 1 && && alien.techcp -= 20) UNTIL (alien.scanners === player.raiders || alien.techcp < 20
+      6. IF player.cloaking > alien.scanners && dieRoll < 5 THEN (alien.scanners += 1 && && alien.techcp -= 20) UNTIL (alien.scanners === player.cloaking || alien.techcp < 20
       7. IF alien.shipSize===1 || (alien.shipSize===2 && dieRoll < 8) || (alien.shipSize===3 && dieRoll < 7) || (alien.shipSize===4 && dieRoll < 6) || (alien.shipSize===5 && dieRoll < 4) THEN alien.shipSize +=1 and alien.techcp -(10||15||20||20||20)
       8. Have you shown point defense? 
       9. IF alien.fighters > 0 && player.pointDefense===0 && dieRoll < 7 THEN alien.fighters += 1 && alien.techcp -=25
@@ -168,6 +220,11 @@ class PlayerPhase extends Component {
       26. IF (alien.minesweeper > 0) 
         instructions.push('This alien scouts have minesweeping');
     */
+
+    /* show the fleet construction instructions */
+    this.setState({
+      step: 'fleet construction'
+    });
   };
 
   fleetConstructedHandler = () => {
@@ -240,6 +297,15 @@ class PlayerPhase extends Component {
           />
         </Aux>
       );
+    } else if (this.state.step === 'player tech reveal') {
+      console.log('player tech reveal');
+      step = (
+        <PlayerTechReveal
+          player={this.props.player}
+          playerTechUpdated={this.playerTechUpdatedHandler}
+          proceed={this.constructFleet}
+        />
+      );
     } else if (this.state.step === 'fleet construction') {
       console.log('fleet construction');
       step = (
@@ -267,7 +333,7 @@ class PlayerPhase extends Component {
       );
     }
 
-    return <div className={classes.instructions}>{step}</div>;
+    return <Aux>{step}</Aux>;
   }
 }
 
@@ -287,6 +353,12 @@ const mapDispatchToProps = dispatch => {
     onUpdateAliens: payload => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
+        payload: payload
+      });
+    },
+    onUpdatePlayerTech: payload => {
+      dispatch({
+        type: actionTypes.UPDATE_PLAYER_TECH,
         payload: payload
       });
     }
