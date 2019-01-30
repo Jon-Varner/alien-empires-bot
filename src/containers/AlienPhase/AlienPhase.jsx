@@ -229,22 +229,39 @@ class AlienPhase extends Component {
         if (currentRoll <= fleetLaunchTarget) {
           /* Build a fleet of all affordable raiders or make the fleet's CP for later */
 
+          const fleetID = alien.fleets.length + 1;
+
           if (raider) {
-            console.log('build a raider fleet');
-            const numberOfRaiders = Math.floor(alien.fleetcp / 12);
-            alien.fleetcp -= numberOfRaiders * 12;
+            let targetRaiders = Math.floor(alien.fleetcp / 12);
+            var actualRaiders = 0;
+
+            while (alien.fleetcp > 11 && targetRaiders > 0) {
+              actualRaiders += 1;
+              targetRaiders -= 1;
+              alien.fleetcp -= 12;
+            }
+
+            alien.fleets.push({
+              id: fleetID,
+              cp: 0,
+              raider: true,
+              carrier: false,
+              destroyerBuilt: false,
+              encountered: false
+            });
 
             instructions.push(
               <li>
                 <span className={alien.color}>{alien.color}</span> alien
-                launches a fleet of {numberOfRaiders} raiders.
+                launches a fleet of {actualRaiders} raiders.
               </li>
             );
           } else {
-            const fleetID = alien.fleets.length + 1;
             alien.fleets.push({
               id: fleetID,
               cp: alien.fleetcp,
+              raider: false,
+              carrier: false,
               encountered: false
             });
             alien.fleetcp = 0;

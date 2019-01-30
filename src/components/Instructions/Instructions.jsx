@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import classes from './Instructions.module.scss';
 
@@ -11,5 +12,9 @@ const instructions = props => (
     </ol>
   </div>
 );
+
+instructions.propTypes = {
+  instructions: PropTypes.array.isRequired
+};
 
 export default instructions;

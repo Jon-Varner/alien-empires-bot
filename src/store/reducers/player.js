@@ -1,15 +1,13 @@
 import * as actionTypes from '../actions';
 
 const initialState = {
-  player: [
-    {
-      fighters: 0,
-      pointDefense: 0,
-      scanners: 0,
-      cloaking: 0,
-      mines: 0
-    }
-  ]
+  player: {
+    fighters: 0,
+    pointDefense: 0,
+    scanners: 0,
+    cloaking: 0,
+    mines: 0
+  }
 };
 
 const reducer = (state = initialState, action) => {

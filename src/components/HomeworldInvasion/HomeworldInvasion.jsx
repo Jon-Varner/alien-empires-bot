@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Aux from '../../hoc/Auxiliary';
 
@@ -32,5 +33,11 @@ const homeworldInvasion = props => (
     </ul>
   </Aux>
 );
+
+homeworldInvasion.propTypes = {
+  aliens: PropTypes.array.isRequired,
+  homeworldInvaded: PropTypes.func.isRequired,
+  proceed: PropTypes.func.isRequired
+};
 
 export default homeworldInvasion;

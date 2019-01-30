@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import Aux from '../../hoc/Auxiliary';
 
@@ -61,5 +62,11 @@ class FleetEncounter extends Component {
     );
   }
 }
+
+FleetEncounter.propTypes = {
+  aliens: PropTypes.array.isRequired,
+  fleetEncountered: PropTypes.func.isRequired,
+  proceed: PropTypes.func.isRequired
+};
 
 export default FleetEncounter;

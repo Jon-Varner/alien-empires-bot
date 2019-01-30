@@ -24,7 +24,7 @@ class Layout extends Component {
     let current;
 
     if (this.props.turn.turn > 0) {
-      current = <Turn turn={this.props.turn} />;
+      current = <Turn phase={this.props.turn.phase} />;
     } else {
       current = <GameSettings />;
     }

@@ -90,7 +90,7 @@ const playerTechReveal = props => (
 );
 
 playerTechReveal.propTypes = {
-  player: PropTypes.array.isRequired,
+  player: PropTypes.object.isRequired,
   playerTechUpdated: PropTypes.func.isRequired,
   proceed: PropTypes.func.isRequired
 };
