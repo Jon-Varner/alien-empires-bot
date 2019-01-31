@@ -7,12 +7,6 @@ import Instructions from '../../components/Instructions/Instructions';
 import * as actionTypes from '../../store/actions';
 
 class AlienPhase extends Component {
-  state = {
-    aliens: [],
-    instructions: [],
-    fleetLaunched: false
-  };
-
   /* the game always uses a single 10-sided die */
   rollDie = () => {
     return Math.floor(Math.random() * Math.floor(11));
@@ -312,7 +306,7 @@ class AlienPhase extends Component {
       }
     }
 
-    this.setState({
+    this.props.updateAliens({
       aliens: aliens,
       fleetLaunched: fleetLaunched
     });
@@ -321,13 +315,14 @@ class AlienPhase extends Component {
   };
 
   advanceHandler = () => {
+    const fleetLaunched = this.props.fleetLaunched;
     let step = this.props.step;
 
-    if (this.state.fleetLaunched) {
+    if (fleetLaunched) {
       step = 'fleet encounters';
     }
-    this.props.onUpdateAliens({
-      aliens: this.state.aliens,
+
+    this.props.advance({
       step: step
     });
   };
@@ -340,13 +335,15 @@ class AlienPhase extends Component {
       this.props.cpPerTurn
     );
 
-    this.setState({ instructions: instructions });
+    this.props.setInstructions({ instructions: instructions });
   }
 
   render() {
+    const instructions = [...this.props.instructions];
+
     return (
       <Aux>
-        <Instructions instructions={this.state.instructions} />
+        <Instructions instructions={instructions} />
         <button className="advance" onClick={this.advanceHandler}>
           END TURN
         </button>
@@ -359,21 +356,47 @@ const mapStateToProps = state => {
   return {
     cpPerTurn: state.aliens.cpPerTurn,
     aliens: state.aliens.aliens,
+    fleetLaunched: state.aliens.fleetLaunched,
     player: state.player.player,
     turn: state.turn.turn,
-    step: state.turn.step
+    step: state.turn.step,
+    instructions: state.instructions.instructions
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onUpdateAliens: ({ aliens, step }) => {
+    updateAliens: ({ aliens, fleetLaunched }) => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
         payload: {
           aliens: aliens
         }
       });
+      dispatch({
+        type: actionTypes.SET_FLEET_LAUNCHED,
+        payload: {
+          fleetLaunched: fleetLaunched
+        }
+      });
+    },
+    setFleetLaunched: ({ fleetLaunched }) => {
+      dispatch({
+        type: actionTypes.SET_FLEET_LAUNCHED,
+        payload: {
+          fleetLaunched: fleetLaunched
+        }
+      });
+    },
+    setInstructions: ({ instructions }) => {
+      dispatch({
+        type: actionTypes.SET_INSTRUCTIONS,
+        payload: {
+          instructions: instructions
+        }
+      });
+    },
+    advance: ({ step }) => {
       dispatch({
         type: actionTypes.ADVANCE_STEP,
         payload: {

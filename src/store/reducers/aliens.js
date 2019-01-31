@@ -2,9 +2,10 @@ import * as actionTypes from '../actions';
 
 const initialState = {
   cpPerTurn: 5,
-  aliens: [],
+  aliens: [{ id: 0, color: 'red' }, { id: 1, color: 'blue' }],
   currentAlien: {},
-  currentFleet: {}
+  currentFleet: {},
+  fleetLaunched: false
 };
 
 const reducer = (state = initialState, action) => {
@@ -14,6 +15,11 @@ const reducer = (state = initialState, action) => {
         ...state,
         cpPerTurn: action.payload.cpPerTurn,
         aliens: action.payload.aliens
+      };
+    case actionTypes.SET_FLEET_LAUNCHED:
+      return {
+        ...state,
+        fleetLaunched: action.payload.fleetLaunched
       };
     case actionTypes.SET_CURRENT_ALIEN_AND_FLEET:
       return {

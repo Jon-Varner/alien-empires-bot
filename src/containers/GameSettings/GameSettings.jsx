@@ -6,17 +6,32 @@ import * as actionTypes from '../../store/actions';
 import classes from './GameSettings.module.scss';
 
 class GameSettings extends Component {
-  state = {
-    cpPerTurn: 5,
-    aliens: [{ id: 0, color: 'red' }, { id: 1, color: 'blue' }]
-  };
-
   createAliens = count => {
     const aliens = [];
 
     for (let i = 0; i < count; i++) {
       let color = this.getUniqueColor(i);
-      aliens.push({ id: i, color: color });
+      aliens.push({
+        id: i,
+        color: color,
+        econRolls: 0,
+        extraRollOnTurn: [1],
+        fleetcp: 0,
+        techcp: 0,
+        defensecp: 0,
+        movement: 1,
+        pointDefense: 0,
+        minesweeper: 0,
+        scanners: 0,
+        shipSize: 1,
+        fighters: 0,
+        cloaking: 0,
+        attack: 0,
+        defense: 0,
+        tactics: 0,
+        exploration: 0,
+        fleets: []
+      });
     }
 
     return aliens;
@@ -65,19 +80,17 @@ class GameSettings extends Component {
     /* Ensure each alien has a unique color */
     const thisColor = event.target.value;
     const thisId = parseInt(event.target.id);
+    const aliens = [...this.props.aliens];
 
-    const duplicate = this.state.aliens.find(
-      alien => alien.color === thisColor
-    );
+    const duplicate = aliens.find(alien => alien.color === thisColor);
 
     if (duplicate) {
       /* Display error? */
     } else {
-      const aliens = [...this.state.aliens];
       const alien = aliens.find(alien => alien.id === thisId);
       alien.color = thisColor;
 
-      this.setState({
+      this.props.updateAliens({
         aliens: aliens
       });
     }
@@ -88,10 +101,9 @@ class GameSettings extends Component {
 
     /* Set number of aliens and set CP per turn */
     const aliens = this.createAliens(this.getAlienCount(difficulty));
-
     const cp = this.getCPperTurn(difficulty);
 
-    this.setState({
+    this.props.setDifficulty({
       cpPerTurn: cp,
       aliens: aliens
     });
@@ -100,34 +112,12 @@ class GameSettings extends Component {
   startHandler = () => {
     /* Add all the extra empty properties */
 
-    const aliens = this.state.aliens.map(alien => ({
-      ...alien,
-      econRolls: 0,
-      extraRollOnTurn: [1],
-      fleetcp: 0,
-      techcp: 0,
-      defensecp: 0,
-      movement: 1,
-      pointDefense: 0,
-      minesweeper: 0,
-      scanners: 0,
-      shipSize: 1,
-      fighters: 0,
-      cloaking: 0,
-      attack: 0,
-      defense: 0,
-      tactics: 0,
-      exploration: 0,
-      fleets: []
-    }));
-
-    this.props.onSetDifficulty({
-      cpPerTurn: this.state.cpPerTurn,
-      aliens: aliens
-    });
+    this.props.startGame();
   };
 
   render() {
+    const aliens = [...this.props.aliens];
+
     return (
       <div className={classes.settings}>
         <label htmlFor="difficultySelector">Difficulty:</label>
@@ -146,7 +136,7 @@ class GameSettings extends Component {
 
         <label>Alien Empire colors:</label>
         <ul>
-          {this.state.aliens.map((alien, index) => {
+          {aliens.map((alien, index) => {
             return (
               <li className={classes.alien} key={index}>
                 <select
@@ -172,9 +162,25 @@ class GameSettings extends Component {
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    cpPerTurn: state.aliens.cpPerTurn,
+    aliens: state.aliens.aliens
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   return {
-    onSetDifficulty: ({ cpPerTurn, aliens }) => {
+    updateAliens: ({ aliens }) => {
+      dispatch({
+        type: actionTypes.UPDATE_ALIENS,
+        payload: {
+          aliens: aliens
+        }
+      });
+    },
+
+    setDifficulty: ({ cpPerTurn, aliens }) => {
       dispatch({
         type: actionTypes.SET_DIFFICULTY,
         payload: {
@@ -182,7 +188,9 @@ const mapDispatchToProps = dispatch => {
           aliens: aliens
         }
       });
+    },
 
+    startGame: () => {
       dispatch({
         type: actionTypes.START_GAME
       });
@@ -191,6 +199,6 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(GameSettings);
