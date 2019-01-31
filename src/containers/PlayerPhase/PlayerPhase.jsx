@@ -56,8 +56,8 @@ class PlayerPhase extends Component {
         then get latest player tech in order to correctly build the fleet */
     this.props.onUpdateCurrentFleet({
       step: 'player tech reveal',
-      currentAlien: alien,
-      currentFleet: fleet
+      alien: alien,
+      fleet: fleet
     });
   };
 
@@ -761,42 +761,57 @@ const mapDispatchToProps = dispatch => {
     onAdvancePhase: () => {
       dispatch({ type: actionTypes.ADVANCE_PHASE });
     },
-    onAdvanceStep: payload => {
+    onAdvanceStep: ({ step }) => {
       dispatch({
         type: actionTypes.ADVANCE_STEP,
-        payload: payload
+        payload: {
+          step: step
+        }
       });
     },
-    onUpdateCurrentFleet: payload => {
+    onUpdateCurrentFleet: ({ step, alien, fleet }) => {
       dispatch({
         type: actionTypes.ADVANCE_STEP,
-        payload: payload
+        payload: {
+          step: step
+        }
       });
       dispatch({
         type: actionTypes.SET_CURRENT_ALIEN_AND_FLEET,
-        payload: payload
+        payload: {
+          alien: alien,
+          fleet: fleet
+        }
       });
     },
-    onUpdateAliens: payload => {
+    onUpdateAliens: ({ aliens }) => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
-        payload: payload
+        payload: {
+          aliens: aliens
+        }
       });
     },
-    onUpdatePlayerTech: payload => {
+    onUpdatePlayerTech: ({ player }) => {
       dispatch({
         type: actionTypes.UPDATE_PLAYER_TECH,
-        payload: payload
+        payload: {
+          player: player
+        }
       });
     },
-    onSetInstructions: payload => {
+    onSetInstructions: ({ step, instructions }) => {
       dispatch({
         type: actionTypes.ADVANCE_STEP,
-        payload: payload
+        payload: {
+          step: step
+        }
       });
       dispatch({
         type: actionTypes.SET_INSTRUCTIONS,
-        payload: payload
+        payload: {
+          instructions: instructions
+        }
       });
     }
   };

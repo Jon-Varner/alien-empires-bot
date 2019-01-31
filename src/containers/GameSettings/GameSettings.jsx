@@ -174,10 +174,13 @@ class GameSettings extends Component {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onSetDifficulty: payload => {
+    onSetDifficulty: ({ cpPerTurn, aliens }) => {
       dispatch({
         type: actionTypes.SET_DIFFICULTY,
-        payload: payload
+        payload: {
+          cpPerTurn: cpPerTurn,
+          aliens: aliens
+        }
       });
 
       dispatch({

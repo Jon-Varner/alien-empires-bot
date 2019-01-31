@@ -18,8 +18,8 @@ const reducer = (state = initialState, action) => {
     case actionTypes.SET_CURRENT_ALIEN_AND_FLEET:
       return {
         ...state,
-        currentAlien: action.payload.currentAlien,
-        currentFleet: action.payload.currentFleet
+        currentAlien: action.payload.alien,
+        currentFleet: action.payload.fleet
       };
     case actionTypes.UPDATE_ALIENS:
       return {

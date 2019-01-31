@@ -367,14 +367,18 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onUpdateAliens: payload => {
+    onUpdateAliens: ({ aliens, step }) => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
-        payload: payload
+        payload: {
+          aliens: aliens
+        }
       });
       dispatch({
         type: actionTypes.ADVANCE_STEP,
-        payload: payload
+        payload: {
+          step: step
+        }
       });
       dispatch({
         type: actionTypes.ADVANCE_PHASE
