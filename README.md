@@ -2,6 +2,8 @@
 
 <p>This app handles all of the calculations for the alien empires in the <a href="https://www.gmtgames.com/p-533-space-empires-3rd-printing.aspx">Space Empires: 4x</a> solo scenario.</p>
 
+<p>It is optimized for mobile and can be found here: <a href="https://alien-empires-bot.herokuapp.com/">https://alien-empires-bot.herokuapp.com/</a>
+
 <h2>What does it do?</h2>
 
 <p>Alien Empires Bot implements the rules outlined in the Space Empires: 4x scenario book to do all of the calculations for determining the alien empires' economies, technology research, fleet construction and (eventually) planetary defense construction.</p>
