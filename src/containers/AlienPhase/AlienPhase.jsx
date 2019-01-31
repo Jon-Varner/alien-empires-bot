@@ -9,7 +9,8 @@ import * as actionTypes from '../../store/actions';
 class AlienPhase extends Component {
   state = {
     aliens: [],
-    instructions: []
+    instructions: [],
+    fleetLaunched: false
   };
 
   /* the game always uses a single 10-sided die */
@@ -21,8 +22,8 @@ class AlienPhase extends Component {
     let instructions = [];
     let fleetLaunchTarget = 0;
     let launchModifier = 0;
-    let raider = false;
     let fleetLaunched = false;
+    let raider = false;
     let currentRoll = 0;
 
     /* For each alien: */
@@ -217,14 +218,7 @@ class AlienPhase extends Component {
         /* Subtract roll modifier */
 
         currentRoll = this.rollDie();
-
-        console.log('launch target=' + fleetLaunchTarget);
-        console.log('launch roll = ' + currentRoll);
-        console.log('launch modifier = ' + launchModifier);
-
         currentRoll -= launchModifier;
-
-        console.log('modified roll =' + currentRoll);
 
         if (currentRoll <= fleetLaunchTarget) {
           /* Build a fleet of all affordable raiders or make the fleet's CP for later */
@@ -319,15 +313,22 @@ class AlienPhase extends Component {
     }
 
     this.setState({
-      aliens: aliens
+      aliens: aliens,
+      fleetLaunched: fleetLaunched
     });
 
     return instructions;
   };
 
   advanceHandler = () => {
+    let step = this.props.step;
+
+    if (this.state.fleetLaunched) {
+      step = 'fleet encounters';
+    }
     this.props.onUpdateAliens({
-      aliens: this.state.aliens
+      aliens: this.state.aliens,
+      step: step
     });
   };
 
@@ -359,7 +360,8 @@ const mapStateToProps = state => {
     cpPerTurn: state.aliens.cpPerTurn,
     aliens: state.aliens.aliens,
     player: state.player.player,
-    turn: state.turn.turn
+    turn: state.turn.turn,
+    step: state.turn.step
   };
 };
 
@@ -370,7 +372,10 @@ const mapDispatchToProps = dispatch => {
         type: actionTypes.UPDATE_ALIENS,
         payload: payload
       });
-
+      dispatch({
+        type: actionTypes.ADVANCE_STEP,
+        payload: payload
+      });
       dispatch({
         type: actionTypes.ADVANCE_PHASE
       });

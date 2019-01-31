@@ -7,13 +7,15 @@ import App from './App';
 import turnReducer from './store/reducers/turn';
 import playerReducer from './store/reducers/player';
 import aliensReducer from './store/reducers/aliens';
+import instructionsReducer from './store/reducers/instructions';
 
 import './index.scss';
 
 const rootReducer = combineReducers({
   turn: turnReducer,
   player: playerReducer,
-  aliens: aliensReducer
+  aliens: aliensReducer,
+  instructions: instructionsReducer
 });
 
 const store = createStore(rootReducer);

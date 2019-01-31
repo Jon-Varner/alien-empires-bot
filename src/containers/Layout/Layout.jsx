@@ -10,11 +10,11 @@ class Layout extends Component {
   displayHeadline = () => {
     let headline = '';
 
-    if (this.props.turn.turn === 0) {
+    if (this.props.turn === 0) {
       headline = 'Select Alien Empires';
     } else {
-      const phase = this.props.turn.phase === 'player' ? 'Player' : 'Aliens';
-      headline = 'Turn #' + this.props.turn.turn + ': ' + phase + ' Phase';
+      const phase = this.props.phase === 'player' ? 'Player' : 'Aliens';
+      headline = 'Turn #' + this.props.turn + ': ' + phase + ' Phase';
     }
 
     return headline;
@@ -23,8 +23,8 @@ class Layout extends Component {
   render() {
     let current;
 
-    if (this.props.turn.turn > 0) {
-      current = <Turn phase={this.props.turn.phase} />;
+    if (this.props.turn > 0) {
+      current = <Turn phase={this.props.phase} />;
     } else {
       current = <GameSettings />;
     }
@@ -40,7 +40,8 @@ class Layout extends Component {
 
 const mapStateToProps = state => {
   return {
-    turn: state.turn
+    turn: state.turn.turn,
+    phase: state.turn.phase
   };
 };
 

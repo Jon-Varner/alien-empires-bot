@@ -11,16 +11,34 @@ import HomeworldInvasion from '../../components/HomeworldInvasion/HomeworldInvas
 import * as actionTypes from '../../store/actions';
 
 class PlayerPhase extends Component {
-  state = {
-    step: 'fleet encounters',
-    instructions: [],
-    currentAlien: [],
-    currentFleet: []
-  };
-
   /* the game always uses a single 10-sided die */
   rollDie = () => {
     return Math.floor(Math.random() * Math.floor(11));
+  };
+
+  checkForFleets = () => {
+    const aliens = [...this.props.aliens];
+    const allFleets = [];
+
+    aliens.forEach(alien => {
+      const fleets = [...alien.fleets];
+
+      fleets.forEach(fleet => {
+        if (fleet.encountered === false) {
+          allFleets.push({
+            color: alien.color,
+            alienId: alien.id,
+            fleetId: fleet.id
+          });
+        }
+      });
+    });
+
+    if (allFleets.length > 0) {
+      return allFleets;
+    } else {
+      return null;
+    }
   };
 
   fleetEncounteredHandler = (alienId, fleetId) => {
@@ -28,16 +46,15 @@ class PlayerPhase extends Component {
     show screen with select boxes for all player techs
     */
     const aliens = [...this.props.aliens];
-
-    /* Look up this alien ID */
     const alien = aliens.find(alien => alien.id === alienId);
     const fleet = alien.fleets.find(fleet => fleet.id === fleetId);
 
     /* Mark fleet as encountered */
     fleet.encountered = true;
 
-    /* Get latest player tech in order to correctly build the fleet */
-    this.setState({
+    /* Store current alien and fleet to local state,
+        then get latest player tech in order to correctly build the fleet */
+    this.props.onUpdateCurrentFleet({
       step: 'player tech reveal',
       currentAlien: alien,
       currentFleet: fleet
@@ -67,22 +84,18 @@ class PlayerPhase extends Component {
         break;
     }
 
-    console.log(player);
-
     this.props.onUpdatePlayerTech({
       player: player
     });
   };
 
   constructFleet = () => {
-    const alien = this.state.currentAlien;
-    const fleet = this.state.currentFleet;
+    const aliens = [...this.props.aliens];
+    const alien = { ...this.props.currentAlien };
+    const fleet = { ...this.props.currentFleet };
     const player = { ...this.props.player };
     const instructions = [];
     let currentRoll = 0;
-
-    console.log('Alien fleet is ' + alien.color + ' #' + fleet.id);
-    console.log(player);
 
     /* The following calculations and priorities are implementations of the scenario rules */
 
@@ -197,6 +210,8 @@ class PlayerPhase extends Component {
       26. IF (alien.minesweeper > 0) 
         instructions.push('This alien scouts have minesweeping');                                                  
     */
+
+    console.log('Current alien tech CP is ' + alien.techcp);
 
     if (player.fighters > 0 && alien.pointDefense === 0 && alien.techcp > 19) {
       alien.pointDefense += 1;
@@ -595,10 +610,15 @@ class PlayerPhase extends Component {
 
     alien.fleetcp += fleet.cp;
     fleet.cp = 0;
-    fleet.encountered = true;
+
+    /* Update this alien's technologies */
+    /* Update the alien in the aliens array and push it to Redux */
+    let index = aliens.findIndex(item => item.id === alien.id);
+    aliens.splice(index, 1, alien);
+    this.props.onUpdateAliens({ aliens: aliens });
 
     /* show the fleet construction instructions */
-    this.setState({
+    this.props.onSetInstructions({
       step: 'fleet construction',
       instructions: instructions
     });
@@ -606,8 +626,10 @@ class PlayerPhase extends Component {
 
   fleetConstructedHandler = () => {
     const aliens = [...this.props.aliens];
-    const alien = this.state.currentAlien;
-    const fleet = this.state.currentFleet;
+    const alien = { ...this.props.currentAlien };
+    const fleet = { ...this.props.currentFleet };
+    let fleetsExist = null;
+    let step = 'homeworld invasions';
 
     /* Return any remaining fleet CP */
 
@@ -620,16 +642,23 @@ class PlayerPhase extends Component {
     fleets.splice(index, 1, fleet);
     alien.fleets = fleets;
 
-    /* return to encounter phase */
-    this.setState({
-      step: 'fleet encounters',
-      instructions: []
-    });
-
     /* Update the alien in the aliens array and push it to Redux */
     index = aliens.findIndex(item => item.id === alien.id);
     aliens.splice(index, 1, alien);
     this.props.onUpdateAliens({ aliens: aliens });
+
+    /* Check for existing fleets */
+    fleetsExist = this.checkForFleets();
+
+    if (fleetsExist !== null) {
+      step = 'fleet encounters';
+    }
+
+    /* return to encounter phase */
+    this.props.onSetInstructions({
+      step: step,
+      instructions: []
+    });
   };
 
   homeworldInvadedHandler = alienId => {
@@ -646,26 +675,29 @@ class PlayerPhase extends Component {
       </li>
     );
 
-    this.setState({ step: 'defense construction', instructions: instructions });
+    this.props.onSetInstructions({
+      step: 'defense construction',
+      instructions: instructions
+    });
   };
 
   proceedHandler = stage => {
     if (stage === 'no fleet encounter') {
       /* go to homeworld invasion */
-      this.setState({ step: 'homeworld invasions' });
+      this.props.onAdvanceStep({ step: 'homeworld invasions' });
     } else if (stage === 'no homeworld invasion') {
       /* advance to next econ phase */
-      this.props.onAdvance();
+      this.props.onAdvancePhase();
     } else {
     }
   };
 
   render() {
-    let step;
+    const step = this.props.step;
+    let stepComponents;
 
-    if (this.state.step === 'fleet encounters') {
-      console.log('fleet encounters');
-      step = (
+    if (step === 'fleet encounters') {
+      stepComponents = (
         <Aux>
           <FleetEncounter
             aliens={this.props.aliens}
@@ -674,26 +706,23 @@ class PlayerPhase extends Component {
           />
         </Aux>
       );
-    } else if (this.state.step === 'player tech reveal') {
-      console.log('player tech reveal');
-      step = (
+    } else if (step === 'player tech reveal') {
+      stepComponents = (
         <PlayerTechReveal
           player={this.props.player}
           playerTechUpdated={this.playerTechUpdatedHandler}
           proceed={this.constructFleet}
         />
       );
-    } else if (this.state.step === 'fleet construction') {
-      console.log('fleet construction');
-      step = (
+    } else if (step === 'fleet construction') {
+      stepComponents = (
         <FleetConstruction
-          instructions={this.state.instructions}
+          instructions={this.props.instructions}
           fleetConstructed={this.fleetConstructedHandler}
         />
       );
-    } else if (this.state.step === 'homeworld invasions') {
-      console.log('homeworld invasions');
-      step = (
+    } else if (step === 'homeworld invasions') {
+      stepComponents = (
         <HomeworldInvasion
           aliens={this.props.aliens}
           homeworldInvaded={this.homeworldInvadedHandler}
@@ -702,30 +731,51 @@ class PlayerPhase extends Component {
       );
     } else {
       console.log('UNHANDLED EXCEPTION');
-      step = (
+      stepComponents = (
         <Instructions
-          instructions={this.state.instructions}
+          instructions={this.props.instructions}
           proceedHandler={this.proceedHandler}
         />
       );
     }
 
-    return <Aux>{step}</Aux>;
+    return <Aux>{stepComponents}</Aux>;
   }
 }
 
 const mapStateToProps = state => {
   return {
     aliens: state.aliens.aliens,
+    currentAlien: state.aliens.currentAlien,
+    currentFleet: state.aliens.currentFleet,
     player: state.player.player,
-    turn: state.turn.turn
+    turn: state.turn.turn,
+    phase: state.turn.phase,
+    step: state.turn.step,
+    instructions: state.instructions.instructions
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    onAdvance: () => {
+    onAdvancePhase: () => {
       dispatch({ type: actionTypes.ADVANCE_PHASE });
+    },
+    onAdvanceStep: payload => {
+      dispatch({
+        type: actionTypes.ADVANCE_STEP,
+        payload: payload
+      });
+    },
+    onUpdateCurrentFleet: payload => {
+      dispatch({
+        type: actionTypes.ADVANCE_STEP,
+        payload: payload
+      });
+      dispatch({
+        type: actionTypes.SET_CURRENT_ALIEN_AND_FLEET,
+        payload: payload
+      });
     },
     onUpdateAliens: payload => {
       dispatch({
@@ -736,6 +786,16 @@ const mapDispatchToProps = dispatch => {
     onUpdatePlayerTech: payload => {
       dispatch({
         type: actionTypes.UPDATE_PLAYER_TECH,
+        payload: payload
+      });
+    },
+    onSetInstructions: payload => {
+      dispatch({
+        type: actionTypes.ADVANCE_STEP,
+        payload: payload
+      });
+      dispatch({
+        type: actionTypes.SET_INSTRUCTIONS,
         payload: payload
       });
     }

@@ -2,7 +2,8 @@ import * as actionTypes from '../actions';
 
 const initialState = {
   turn: 0,
-  phase: 'alien'
+  phase: 'alien',
+  step: 'homeworld invasions'
 };
 
 const reducer = (state = initialState, action) => {
@@ -23,8 +24,14 @@ const reducer = (state = initialState, action) => {
         phase = 'alien';
       }
       return {
+        ...state,
         turn: turn,
         phase: phase
+      };
+    case actionTypes.ADVANCE_STEP:
+      return {
+        ...state,
+        step: action.payload.step
       };
     default:
       return state;
