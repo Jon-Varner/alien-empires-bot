@@ -16,6 +16,14 @@ class PlayerPhase extends Component {
     return Math.floor(Math.random() * Math.floor(11));
   };
 
+  pluralize = (ship, count) => {
+    if (count > 1) {
+      return ship + 's';
+    } else {
+      return ship;
+    }
+  };
+
   checkForFleets = () => {
     const aliens = [...this.props.aliens];
     const allFleets = [];
@@ -180,7 +188,7 @@ class PlayerPhase extends Component {
     console.log('Current roll = ' + currentRoll);
 
     if (
-      fleet.raider === true &&
+      fleet.raiders > 0 &&
       alien.cloaking < 2 &&
       alien.techcp > 29 &&
       currentRoll < 7
@@ -393,11 +401,9 @@ class PlayerPhase extends Component {
       alien.fighters > 0 &&
       (player.pointDefense === 0 || currentRoll < 5)
     ) {
-      fleet.carrier = true;
       fleet.cp -= 27;
-      instructions.push(
-        <li>Add a Carrier and 3 Fighters (level {alien.fighters})</li>
-      );
+      fleet.carriers += 1;
+      fleet.fighters += 3;
     }
 
     /* Next attempt to build a fleet of raiders */
@@ -407,10 +413,8 @@ class PlayerPhase extends Component {
       fleet.cp > 11 &&
       alien.cloaking > player.scanners
     ) {
-      fleet.raider = true;
-
       let targetRaiders = Math.floor(fleet.cp / 12);
-      var actualRaiders = 0;
+      let actualRaiders = 0;
 
       while (fleet.cp > 11 && targetRaiders > 0) {
         actualRaiders += 1;
@@ -418,40 +422,34 @@ class PlayerPhase extends Component {
         fleet.cp -= 12;
       }
 
-      instructions.push(
-        <li>
-          Add {actualRaiders} Raiders with cloaking level {alien.cloaking}
-        </li>
-      );
+      fleet.raiders += actualRaiders;
 
       /* Otherwise build a mixed fleet */
-    } else if (fleet.raider === false) {
+    } else if (fleet.raiders === 0) {
       /* Build the largest ship possible */
       if (alien.shipSize > 5 && fleet.cp > 23) {
         fleet.cp -= 24;
-        instructions.push(<li>Add a Dreadnaught</li>);
+        fleet.dreadnaughts += 1;
       } else if (alien.shipSize > 4 && fleet.cp > 19) {
         fleet.cp -= 20;
-        instructions.push(<li>Add a Battleship</li>);
+        fleet.battleships += 1;
       } else if (alien.shipSize > 3 && fleet.cp > 14) {
         fleet.cp -= 15;
-        instructions.push(<li>Add a Battlecruiser</li>);
+        fleet.battlecruisers += 1;
       } else if (alien.shipSize > 2 && fleet.cp > 11) {
         fleet.cp -= 12;
-        instructions.push(<li>Add a Cruiser</li>);
+        fleet.cruisers += 1;
       } else if (alien.shipSize > 1 && fleet.cp > 8) {
         fleet.cp -= 9;
         fleet.destroyerBuilt = true;
-        instructions.push(<li>Add a Destroyer</li>);
+        fleet.destroyers += 1;
       } else {
         fleet.cp -= 6;
-        instructions.push(<li>Add a Scout</li>);
+        fleet.scouts += 1;
       }
     }
 
-    if (fleet.raider) {
-      instructions.push(<li>This is a raider fleet</li>);
-    } else {
+    if (fleet.raiders === 0) {
       /* Build a Destroyer, if needed */
       if (
         alien.scanners >= player.cloaking &&
@@ -460,7 +458,7 @@ class PlayerPhase extends Component {
       ) {
         fleet.cp -= 9;
         fleet.destroyerBuilt = true;
-        instructions.push(<li>Add a Destroyer</li>);
+        fleet.destroyers += 1;
       }
 
       currentRoll = this.rollDie();
@@ -472,11 +470,11 @@ class PlayerPhase extends Component {
         player.fighters > 0 &&
         alien.pointDefense > 0 &&
         currentRoll - 2 > 3 &&
-        fleet.carrier === false &&
+        fleet.carriers === 0 &&
         fleet.cp > 11
       ) {
         fleet.cp -= 12;
-        instructions.push(<li>Add 2 Scouts</li>);
+        fleet.scouts += 2;
       }
 
       if (currentRoll < 4) {
@@ -484,15 +482,15 @@ class PlayerPhase extends Component {
 
         while (fleet.cp > 9) {
           fleet.cp -= 6;
-          instructions.push(<li>Add a Scout</li>);
+          fleet.scouts += 1;
         }
 
         if (fleet.cp === 9) {
           fleet.cp -= 9;
-          instructions.push(<li>Add a Destroyer</li>);
+          fleet.destroyers += 1;
         } else if (fleet.cp > 5) {
           fleet.cp -= 6;
-          instructions.push(<li>Add a Scout</li>);
+          fleet.scouts += 1;
         }
 
         /* TODO: Calculate a balanced fleet. This is a trickier algorithm 
@@ -516,29 +514,25 @@ class PlayerPhase extends Component {
         while (fleet.cp > 5) {
           if (alien.shipSize > 5 && fleet.cp > 23) {
             fleet.cp -= 24;
-            instructions.push(<li>Add a Dreadnaught</li>);
+            fleet.dreadnaughts += 1;
           } else if (alien.shipSize > 4 && fleet.cp > 19) {
             fleet.cp -= 20;
-            instructions.push(<li>Add a Battleship</li>);
+            fleet.battleships += 1;
           } else if (alien.shipSize > 3 && fleet.cp > 14) {
             fleet.cp -= 15;
-            instructions.push(<li>Add a Battlecruiser</li>);
+            fleet.battlecruisers += 1;
           } else if (alien.shipSize > 2 && fleet.cp > 11) {
             fleet.cp -= 12;
-            instructions.push(<li>Add a Cruiser</li>);
+            fleet.cruisers += 1;
           } else if (alien.shipSize > 1 && fleet.cp > 8) {
             fleet.cp -= 9;
             fleet.destroyerBuilt = true;
-            instructions.push(<li>Add a Destroyer</li>);
+            fleet.destroyers += 1;
           } else {
             fleet.cp -= 6;
-            instructions.push(<li>Add a Scout</li>);
+            fleet.scouts += 1;
           }
         }
-      }
-
-      if (alien.minesweeper > 0) {
-        instructions.push(<li>All Scouts in this fleet have minesweeping</li>);
       }
     }
 
@@ -558,6 +552,86 @@ class PlayerPhase extends Component {
     aliens.splice(index, 1, alien);
 
     /* show the fleet construction instructions */
+    if (fleet.raiders > 0) {
+      instructions.push(
+        <li>
+          This is a fleet of {fleet.raiders}{' '}
+          {this.pluralize('raider', fleet.raiders)}
+        </li>
+      );
+    }
+
+    if (fleet.carriers > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.carriers} {this.pluralize('carrier', fleet.carriers)}
+        </li>
+      );
+    }
+
+    if (fleet.fighters > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.fighters} {this.pluralize('fighter', fleet.fighters)}
+        </li>
+      );
+    }
+
+    if (fleet.dreadnaughts > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.dreadnaughts}{' '}
+          {this.pluralize('dreadnaught', fleet.dreadnaughts)}
+        </li>
+      );
+    }
+
+    if (fleet.battleships > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.battleships}{' '}
+          {this.pluralize('battleship', fleet.battleships)}
+        </li>
+      );
+    }
+
+    if (fleet.battlecruisers > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.battlecruisers}{' '}
+          {this.pluralize('battlecruiser', fleet.battlecruisers)}
+        </li>
+      );
+    }
+
+    if (fleet.cruisers > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.cruisers} {this.pluralize('cruiser', fleet.cruisers)}
+        </li>
+      );
+    }
+
+    if (fleet.destroyers > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.destroyers} {this.pluralize('destroyer', fleet.destroyers)}
+        </li>
+      );
+    }
+
+    if (fleet.scouts > 0) {
+      instructions.push(
+        <li>
+          Add {fleet.scouts} {this.pluralize('scout', fleet.scouts)}
+        </li>
+      );
+
+      if (alien.minesweeper > 0) {
+        instructions.push(<li>All Scouts in this fleet have minesweeping</li>);
+      }
+    }
+
     this.props.updateAliensAndSetInstructions({
       aliens: aliens,
       step: 'fleet construction',

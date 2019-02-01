@@ -221,7 +221,7 @@ class AlienPhase extends Component {
 
           if (raider) {
             let targetRaiders = Math.floor(alien.fleetcp / 12);
-            var actualRaiders = 0;
+            let actualRaiders = 0;
 
             while (alien.fleetcp > 11 && targetRaiders > 0) {
               actualRaiders += 1;
@@ -232,10 +232,8 @@ class AlienPhase extends Component {
             alien.fleets.push({
               id: fleetID,
               cp: 0,
-              raider: true,
-              carrier: false,
-              destroyerBuilt: false,
-              encountered: false
+              encountered: false,
+              raiders: actualRaiders
             });
 
             instructions.push(
@@ -248,9 +246,16 @@ class AlienPhase extends Component {
             alien.fleets.push({
               id: fleetID,
               cp: alien.fleetcp,
-              raider: false,
-              carrier: false,
-              encountered: false
+              encountered: false,
+              raiders: 0,
+              scouts: 0,
+              destroyers: 0,
+              cruisers: 0,
+              battlecruisers: 0,
+              battleships: 0,
+              dreadnaughts: 0,
+              carriers: 0,
+              fighters: 0
             });
 
             alien.fleetcp = 0;
