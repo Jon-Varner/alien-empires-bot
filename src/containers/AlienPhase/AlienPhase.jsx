@@ -241,7 +241,7 @@ class AlienPhase extends Component {
             instructions.push(
               <li>
                 <span className={alien.color}>{alien.color}</span> alien
-                launches a fleet of {actualRaiders} raiders.
+                launches Fleet #{fleetID} of {actualRaiders} raiders.
               </li>
             );
           } else {
@@ -252,6 +252,7 @@ class AlienPhase extends Component {
               carrier: false,
               encountered: false
             });
+
             alien.fleetcp = 0;
 
             instructions.push(

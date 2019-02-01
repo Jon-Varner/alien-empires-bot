@@ -52,9 +52,8 @@ class PlayerPhase extends Component {
     /* Mark fleet as encountered */
     fleet.encountered = true;
 
-    /* Store current alien and fleet to local state,
-        then get latest player tech in order to correctly build the fleet */
-    this.props.onUpdateCurrentFleet({
+    /* Store current alien and fleet, then get latest player tech in order to correctly build the fleet */
+    this.props.updateCurrentFleet({
       step: 'player tech reveal',
       alien: alien,
       fleet: fleet
@@ -84,7 +83,7 @@ class PlayerPhase extends Component {
         break;
     }
 
-    this.props.onUpdatePlayerTech({
+    this.props.updatePlayerTech({
       player: player
     });
   };
@@ -98,121 +97,6 @@ class PlayerPhase extends Component {
     let currentRoll = 0;
 
     /* The following calculations and priorities are implementations of the scenario rules */
-
-    /*
-      1. What level fighters have you shown?
-      2. IF player.fighters > 0 && alien.pointDefense === 0 THEN alien.pointDefense += 1 && alien.techcp -= 20
-      3. What level mines have you shown?
-      4. IF player.mines > 0 && alien.minesweeper === 0 THEN alien.minesweeper += 1 && alien.techcp -= 10
-      5. What level raiders have you used in combat?
-      6. IF player.cloaking > alien.scanners && dieRoll < 5 THEN (alien.scanners += 1 && && alien.techcp -= 20) UNTIL (alien.scanners === player.cloaking || alien.techcp < 20
-      7. IF alien.shipSize===1 || (alien.shipSize===2 && dieRoll < 8) || (alien.shipSize===3 && dieRoll < 7) || (alien.shipSize===4 && dieRoll < 6) || (alien.shipSize===5 && dieRoll < 4) THEN alien.shipSize +=1 and alien.techcp -(10||15||20||20||20)
-      8. Have you shown point defense? 
-      9. IF alien.fighters > 0 && player.pointDefense===0 && dieRoll < 7 THEN alien.fighters += 1 && alien.techcp -=25
-      10. IF raider fleet && alien.cloaking < 2 && dieRoll < 7 THEN alien.cloaking===2  and alien.techcp -= 30
-      11. What level scanner have you shown?
-      12. IF alien.techcp < 10 no dieRoll
-            ELSE IF alien.techcp < 15 && alien.minesweeper < 10 THEN alien.minesweeper += 1 && alien.techcp -= 10 ELSE GOTO 13
-            ELSE IF alien.techcp < 20 && alien.attack > 1 && alien.defense > 1 THEN alien.tactics += 1 && alien.techcp -=15 ELSE GOTO 13
-            ELSE 
-              dieRoll: 
-                1-2 = attack
-                3-4 = defense
-                5 = tactics
-                6 = cloak
-                7 = scan
-                8 = fighter
-                9 = point defense
-                10 = minesweeper
-
-                case attack: 
-                  IF (alien.attack > 3 || alien.attackCost > alien.techcp) reroll ELSE alien.attack += 1 && alien.techcp -= alien.attackCost
-                case defense:
-                  IF (alien.defense > 3 || alien.defenseCost > alien.techcp) reroll ELSE alien.defense += 1 && alien.techcp -= alien.defenseCost    
-                case tactics:
-                  IF alien.attack < 2 
-                    IF (alien.attackCost > alien.techcp) reroll ELSE alien.attack += 1 && alien.techcp -= alien.attackCost
-                  IF alien.defense < 2
-                    IF (alien.defenseCost > alien.techcp) reroll ELSE alien.defense += 1 && alien.techcp -= alien.defenseCost
-                  ELSE
-                    IF alien.tactics > 2 THEN reroll ELSE alien.tactics += 1 && alien.techcp -= 15
-                case cloak:
-                  IF (alien.cloaking > 1 || player.scanners > 1 || alien.techcp < 30) THEN reroll ELSE alien.cloaking =+ 1 && alien.techcp -= 30
-                case scan:
-                  IF (alien.scanners > 1 || alien.techcp < 20) THEN reroll ELSE alien.scanners += 1 && alien.techcp -= 20
-                case fighter:
-                  IF (alien.fighters > 2 || alien.techcp < 25) THEN reroll ELSE alien.fighters += 1 && alien.techcp -= 25
-                case point defense:
-                  IF (alien.pointDefense > 2 || alien.techcp < 20) THEN reroll ELSE alien.pointDefense += 1 && alien.techcp -= 20
-                case minesweeper:
-                  IF (alien.minesweeper > 1 || alien.techcp < mine sweeper cost [10||15]) THEN reroll ELSE alien.minesweeper += 1 && alien.techcp -= [10||15]
-      13. IF raider fleet,
-            const numberOfRaiders = Math.floor(fleet.cp / 12);
-            fleet.cp -= numberOfRaiders * 12;
-            instructions.push('add numberOfRaiders');
-            GOTO END
-      14. IF (fleet.cp > 27 && alien.fighters > 0 && (player.pointDefense === 0 || dieRoll < 5))
-            carrierFleet = true
-            fleet.cp -= 27
-            instructions.push('Add a carrier and 3 fighters to fleet')
-            GOTO 14 until false
-            GOTO 15
-      15. IF (!carrierFleet && alien.cloaking > player.scanners && fleet.cp > 11 )
-            const numberOfRaiders = Math.floor(fleet.cp / 12);
-            fleet.cp -= numberOfRaiders * 12;
-            instructions.push('add numberOfRaiders');
-            GOTO END
-          ELSE GOTO 16
-      16. IF (alien.shipSize > 5 && fleet.cp > 23) 
-            fleet.cp -= 24
-            instructions.push('add a Dreadnaught');
-          ELSE IF (alien.shipSize > 4 && fleet.cp > 19) 
-            fleet.cp -= 20
-            instructions.push('add a Battleship');   
-          ELSE IF (alien.shipSize > 3 && fleet.cp > 14) 
-            fleet.cp -= 15
-            instructions.push('add a Battlecruiser');   
-          ELSE IF (alien.shipSize > 2 && fleet.cp > 11)
-            fleet.cp -= 12
-            instructions.push('add a Cruiser');   
-          ELSE IF (alien.shipSize > 1 && fleet.cp > 8)
-              fleet.cp -= 9
-              instructions.push('add a Destroyer'); 
-              destroyerBuilt = true
-          ELSE
-              fleet.cp -= 6
-              instructions.push('add a Scout'); 
-      17. IF (alien.scanners >= player.cloaking && destroyerBuilt===false && fleet.cp > 8)
-            fleet.cp -= 9
-            instructions.push('add a Destroyer');
-      18. IF (dieRoll < 4) THEN largest fleet 
-          ELSE IF (dieRoll < 7) THEN balanced
-          ELSE largest ships       
-      19. IF (player.fighters > 0 && alien.pointDefense > 0 && (above dieRoll-2 > 3 ) && !carrierFleet && fleet.cp > 11)
-          fleet.cp -= 12
-          instructions.push('add 2 Scouts');
-
-      20. IF (largest fleet)
-            UNTIL (fleet.cp < 10)
-              fleet.cp -= 6;
-              instructions.push('add a Scout');
-            THEN IF (fleet.cp===9)
-                fleet.cp -= 9;
-                instructions.push('add a Destroyer');
-              ELSE
-                fleet.cp -= 6;
-                instructions.push('add a Scout');
-      21. ELSE IF (largest ships)
-            UNTIL (fleet.cp < 6)                        
-              GOTO 16    
-      25. alien.fleetcp += remaining fleet.cp
-
-      26. IF (alien.minesweeper > 0) 
-        instructions.push('This alien scouts have minesweeping');                                                  
-    */
-
-    console.log('Current alien tech CP is ' + alien.techcp);
-
     if (player.fighters > 0 && alien.pointDefense === 0 && alien.techcp > 19) {
       alien.pointDefense += 1;
       alien.techcp -= 20;
@@ -251,27 +135,32 @@ class PlayerPhase extends Component {
         break;
       case 3:
         if (alien.techcp > 19 && currentRoll < 7) {
-          alien.shipSize = 3;
+          alien.shipSize = 4;
           alien.techcp -= 20;
         }
         break;
       case 4:
         if (alien.techcp > 19 && currentRoll < 6) {
-          alien.shipSize = 3;
+          alien.shipSize = 5;
           alien.techcp -= 20;
         }
         break;
       case 5:
         if (alien.techcp > 19 && currentRoll < 4) {
-          alien.shipSize = 3;
+          alien.shipSize = 6;
           alien.techcp -= 20;
         }
         break;
       default:
-      /* This should be impossible to reach */
+        /* This should be impossible to reach */
+        console.log('IMPOSSIBLE!');
     }
 
+    console.log('Current alien tech CP is ' + alien.techcp);
+
     currentRoll = this.rollDie();
+
+    console.log('Current roll = ' + currentRoll);
 
     if (
       alien.fighters > 0 &&
@@ -281,21 +170,14 @@ class PlayerPhase extends Component {
     ) {
       alien.fighters += 1;
       alien.techcp -= 25;
+      console.log(
+        'Die roll under 7 and alien has fighters, so alien spent 25 to upgrade fighters'
+      );
     }
 
     currentRoll = this.rollDie();
 
-    if (
-      alien.fighters > 0 &&
-      alien.techcp > 24 &&
-      player.pointDefense === 0 &&
-      currentRoll < 7
-    ) {
-      alien.fighters += 1;
-      alien.techcp -= 25;
-    }
-
-    currentRoll = this.rollDie();
+    console.log('Current roll = ' + currentRoll);
 
     if (
       fleet.raider === true &&
@@ -305,27 +187,35 @@ class PlayerPhase extends Component {
     ) {
       alien.cloaking = 2;
       alien.techcp -= 30;
+      console.log(
+        'Die roll under 7 and alien fleet is raiders, so alien spent 30 to upgrade cloaking'
+      );
     }
 
+    console.log('Current alien tech CP is ' + alien.techcp);
+
     if (alien.techcp > 9) {
-      if (alien.techcp < 15 && alien.minesweeper < 10) {
+      if (alien.techcp < 15 && alien.minesweeper < 2) {
         alien.minesweeper += 1;
         alien.techcp -= 10;
+        console.log('Alien researched minesweeping for 10');
       } else if (alien.techcp < 20 && alien.attack > 1 && alien.defense > 1) {
         alien.tactics += 1;
         alien.techcp -= 15;
+        console.log('Alien researched tactics for 15');
       } else {
         let techSelected = false;
 
         while (!techSelected) {
           currentRoll = this.rollDie();
+          console.log('Current roll = ' + currentRoll);
 
           switch (currentRoll) {
             case 1:
             case 2:
               /* upgrade attack */
               if (alien.attack < 3) {
-                var attackCost = 20;
+                let attackCost = 20;
 
                 if (alien.attack === 1) {
                   attackCost = 30;
@@ -337,6 +227,10 @@ class PlayerPhase extends Component {
                   alien.attack += 1;
                   alien.techcp -= attackCost;
                   techSelected = true;
+                  console.log(
+                    'Die roll was 1/2 so Alien researched attack for ' +
+                      attackCost
+                  );
                 }
               }
               break;
@@ -345,7 +239,7 @@ class PlayerPhase extends Component {
               /* upgrade defense */
 
               if (alien.defense < 3) {
-                var defenseCost = 20;
+                let defenseCost = 20;
 
                 if (alien.defense === 1) {
                   defenseCost = 30;
@@ -357,6 +251,10 @@ class PlayerPhase extends Component {
                   alien.defense += 1;
                   alien.techcp -= defenseCost;
                   techSelected = true;
+                  console.log(
+                    'Die roll was 3/4 so Alien researched defense for ' +
+                      defenseCost
+                  );
                 }
               }
               break;
@@ -364,7 +262,7 @@ class PlayerPhase extends Component {
               /* upgrade attack to 2, then defense to 2, then tactics */
 
               if (alien.attack < 2) {
-                attackCost = 20;
+                let attackCost = 20;
 
                 if (alien.attack === 1) {
                   attackCost = 30;
@@ -374,9 +272,13 @@ class PlayerPhase extends Component {
                   alien.attack += 1;
                   alien.techcp -= attackCost;
                   techSelected = true;
+                  console.log(
+                    'Die roll was 5 BUT attack < 2 so Alien researched attack for ' +
+                      attackCost
+                  );
                 }
               } else if (alien.defense < 2) {
-                defenseCost = 20;
+                let defenseCost = 20;
 
                 if (alien.defense === 1) {
                   defenseCost = 30;
@@ -386,11 +288,18 @@ class PlayerPhase extends Component {
                   alien.defense += 1;
                   alien.techcp -= defenseCost;
                   techSelected = true;
+                  console.log(
+                    'Die roll was 5 BUT defense < 2 so Alien researched defense for ' +
+                      defenseCost
+                  );
                 }
               } else if (alien.tactics < 3 && alien.techcp > 14) {
                 alien.tactics += 1;
                 alien.techcp -= 15;
                 techSelected = true;
+                console.log(
+                  'Die roll was 5 so Alien researched tactics for 15'
+                );
               }
               break;
             case 6:
@@ -404,6 +313,9 @@ class PlayerPhase extends Component {
                 alien.cloaking += 1;
                 alien.techcp -= 30;
                 techSelected = true;
+                console.log(
+                  'Die roll was 6 so Alien researched cloaking for 30'
+                );
               }
               break;
             case 7:
@@ -413,6 +325,9 @@ class PlayerPhase extends Component {
                 alien.scanners += 1;
                 alien.techcp -= 20;
                 techSelected = true;
+                console.log(
+                  'Die roll was 7 so Alien researched scanners for 20'
+                );
               }
               break;
             case 8:
@@ -422,6 +337,9 @@ class PlayerPhase extends Component {
                 alien.fighters += 1;
                 alien.techcp -= 25;
                 techSelected = true;
+                console.log(
+                  'Die roll was 8 so Alien researched fighters for 25'
+                );
               }
               break;
             case 9:
@@ -431,6 +349,9 @@ class PlayerPhase extends Component {
                 alien.pointDefense += 1;
                 alien.techcp -= 20;
                 techSelected = true;
+                console.log(
+                  'Die roll was 9 so Alien researched point defense for 20'
+                );
               }
               break;
             case 10:
@@ -440,15 +361,21 @@ class PlayerPhase extends Component {
                 alien.minesweeper += 1;
                 alien.techcp -= 10;
                 techSelected = true;
+                console.log(
+                  'Die roll was 10 so Alien researched minesweeper for 10'
+                );
               } else if (alien.minesweeper === 1 && alien.techcp > 14) {
                 alien.minesweeper += 1;
                 alien.techcp -= 15;
                 techSelected = true;
+                console.log(
+                  'Die roll was 10 so Alien researched minesweeper 2 for 15'
+                );
               }
               break;
             default:
               /* This should be impossible to reach */
-
+              console.log('IMPOSSIBLE!');
               techSelected = true;
           }
         }
@@ -458,6 +385,8 @@ class PlayerPhase extends Component {
     /* First attempt to build a fleet of carriers and fighters */
 
     currentRoll = this.rollDie();
+
+    console.log('Current roll = ' + currentRoll);
 
     while (
       fleet.cp > 27 &&
@@ -496,7 +425,7 @@ class PlayerPhase extends Component {
       );
 
       /* Otherwise build a mixed fleet */
-    } else {
+    } else if (fleet.raider === false) {
       /* Build the largest ship possible */
       if (alien.shipSize > 5 && fleet.cp > 23) {
         fleet.cp -= 24;
@@ -520,132 +449,125 @@ class PlayerPhase extends Component {
       }
     }
 
-    /* Build a Destroyer, if needed */
-
-    if (
-      alien.scanners >= player.cloaking &&
-      fleet.destroyerBuilt === false &&
-      fleet.cp > 8
-    ) {
-      fleet.cp -= 9;
-      fleet.destroyerBuilt = true;
-      instructions.push(<li>Add a Destroyer</li>);
-    }
-
-    currentRoll = this.rollDie();
-
-    /* Get minimal number of Scouts needed */
-    if (
-      player.fighters > 0 &&
-      alien.pointDefense > 0 &&
-      currentRoll - 2 > 3 &&
-      fleet.carrier === false &&
-      fleet.cp > 11
-    ) {
-      fleet.cp -= 12;
-      instructions.push(<li>Add 2 Scouts</li>);
-    }
-
-    if (currentRoll < 4) {
-      /* Build the largest fleet possible */
-
-      while (fleet.cp > 9) {
-        fleet.cp -= 6;
-        instructions.push(<li>Add a Scout</li>);
-      }
-
-      if (fleet.cp === 9) {
-        fleet.cp -= 9;
-        instructions.push(<li>Add a Destroyer</li>);
-      } else if (fleet.cp > 5) {
-        fleet.cp -= 6;
-        instructions.push(<li>Add a Scout</li>);
-      }
-
-      /* TODO: Calculate a balanced fleet. This is a trickier algorithm 
-
-    } else if (currentRoll < 7) {
-
-      22. ELSE 
-            IF (alien.attack > 2 || alien.defense > 2)
-              GOTO 16
-            ELSE IF (alien.attack > 1 || alien.defense > 1)
-              GOTO 23
-            ELSE 
-              GOTO 24              
-      23. CALCULATE fleet composition for maximum cost effectiveness
-          NO DREADNAUGHTS OR BATTLESHIPS
-      24. CALCULATE fleet composition for maximum cost effectiveness
-          DESTROYERS AND SCOUTS ONLY
-      */
+    if (fleet.raider) {
+      instructions.push(<li>This is a raider fleet</li>);
     } else {
-      /* Build the largest ships possible */
-      while (fleet.cp > 5) {
-        if (alien.shipSize > 5 && fleet.cp > 23) {
-          fleet.cp -= 24;
-          instructions.push(<li>Add a Dreadnaught</li>);
-        } else if (alien.shipSize > 4 && fleet.cp > 19) {
-          fleet.cp -= 20;
-          instructions.push(<li>Add a Battleship</li>);
-        } else if (alien.shipSize > 3 && fleet.cp > 14) {
-          fleet.cp -= 15;
-          instructions.push(<li>Add a Battlecruiser</li>);
-        } else if (alien.shipSize > 2 && fleet.cp > 11) {
-          fleet.cp -= 12;
-          instructions.push(<li>Add a Cruiser</li>);
-        } else if (alien.shipSize > 1 && fleet.cp > 8) {
-          fleet.cp -= 9;
-          fleet.destroyerBuilt = true;
-          instructions.push(<li>Add a Destroyer</li>);
-        } else {
+      /* Build a Destroyer, if needed */
+      if (
+        alien.scanners >= player.cloaking &&
+        fleet.destroyerBuilt === false &&
+        fleet.cp > 8
+      ) {
+        fleet.cp -= 9;
+        fleet.destroyerBuilt = true;
+        instructions.push(<li>Add a Destroyer</li>);
+      }
+
+      currentRoll = this.rollDie();
+
+      console.log('Current roll = ' + currentRoll);
+
+      /* Get minimal number of Scouts needed */
+      if (
+        player.fighters > 0 &&
+        alien.pointDefense > 0 &&
+        currentRoll - 2 > 3 &&
+        fleet.carrier === false &&
+        fleet.cp > 11
+      ) {
+        fleet.cp -= 12;
+        instructions.push(<li>Add 2 Scouts</li>);
+      }
+
+      if (currentRoll < 4) {
+        /* Build the largest fleet possible */
+
+        while (fleet.cp > 9) {
           fleet.cp -= 6;
           instructions.push(<li>Add a Scout</li>);
         }
+
+        if (fleet.cp === 9) {
+          fleet.cp -= 9;
+          instructions.push(<li>Add a Destroyer</li>);
+        } else if (fleet.cp > 5) {
+          fleet.cp -= 6;
+          instructions.push(<li>Add a Scout</li>);
+        }
+
+        /* TODO: Calculate a balanced fleet. This is a trickier algorithm 
+
+      } else if (currentRoll < 7) {
+
+        22. ELSE 
+              IF (alien.attack > 2 || alien.defense > 2)
+                GOTO 16
+              ELSE IF (alien.attack > 1 || alien.defense > 1)
+                GOTO 23
+              ELSE 
+                GOTO 24              
+        23. CALCULATE fleet composition for maximum cost effectiveness
+            NO DREADNAUGHTS OR BATTLESHIPS
+        24. CALCULATE fleet composition for maximum cost effectiveness
+            DESTROYERS AND SCOUTS ONLY
+        */
+      } else {
+        /* Build the largest ships possible */
+        while (fleet.cp > 5) {
+          if (alien.shipSize > 5 && fleet.cp > 23) {
+            fleet.cp -= 24;
+            instructions.push(<li>Add a Dreadnaught</li>);
+          } else if (alien.shipSize > 4 && fleet.cp > 19) {
+            fleet.cp -= 20;
+            instructions.push(<li>Add a Battleship</li>);
+          } else if (alien.shipSize > 3 && fleet.cp > 14) {
+            fleet.cp -= 15;
+            instructions.push(<li>Add a Battlecruiser</li>);
+          } else if (alien.shipSize > 2 && fleet.cp > 11) {
+            fleet.cp -= 12;
+            instructions.push(<li>Add a Cruiser</li>);
+          } else if (alien.shipSize > 1 && fleet.cp > 8) {
+            fleet.cp -= 9;
+            fleet.destroyerBuilt = true;
+            instructions.push(<li>Add a Destroyer</li>);
+          } else {
+            fleet.cp -= 6;
+            instructions.push(<li>Add a Scout</li>);
+          }
+        }
+      }
+
+      if (alien.minesweeper > 0) {
+        instructions.push(<li>All Scouts in this fleet have minesweeping</li>);
       }
     }
 
-    if (alien.minesweeper > 0) {
-      instructions.push(<li>All Scouts in this fleet have minesweeping</li>);
-    }
-
+    /* Return any remaining fleet CP */
     alien.fleetcp += fleet.cp;
     fleet.cp = 0;
 
+    /* Update alien with revised fleet info */
+    const fleets = [...alien.fleets];
+    let index = fleets.findIndex(item => item.id === fleet.id);
+    fleets.splice(index, 1, fleet);
+    alien.fleets = fleets;
+
     /* Update this alien's technologies */
     /* Update the alien in the aliens array and push it to Redux */
-    let index = aliens.findIndex(item => item.id === alien.id);
+    index = aliens.findIndex(item => item.id === alien.id);
     aliens.splice(index, 1, alien);
-    this.props.onUpdateAliens({ aliens: aliens });
 
     /* show the fleet construction instructions */
-    this.props.onSetInstructions({
+    this.props.updateAliensAndSetInstructions({
+      aliens: aliens,
       step: 'fleet construction',
       instructions: instructions
     });
   };
 
   fleetConstructedHandler = () => {
-    const aliens = [...this.props.aliens];
-    const alien = { ...this.props.currentAlien };
-    const fleet = { ...this.props.currentFleet };
     let fleetsExist = null;
     let step = 'homeworld invasions';
-
-    /* Return any remaining fleet CP */
-
-    alien.fleetcp += fleet.cp;
-
-    /* Update aliens with revised fleets and fleet CPs */
-
-    const fleets = [...alien.fleets];
-    let index = fleets.findIndex(item => item.id === fleet.id);
-    fleets.splice(index, 1, fleet);
-    alien.fleets = fleets;
-
-    /* Update the alien in the aliens array and push it to Redux */
-    index = aliens.findIndex(item => item.id === alien.id);
-    aliens.splice(index, 1, alien);
-    this.props.onUpdateAliens({ aliens: aliens });
 
     /* Check for existing fleets */
     fleetsExist = this.checkForFleets();
@@ -655,7 +577,7 @@ class PlayerPhase extends Component {
     }
 
     /* return to encounter phase */
-    this.props.onSetInstructions({
+    this.props.setInstructions({
       step: step,
       instructions: []
     });
@@ -675,7 +597,7 @@ class PlayerPhase extends Component {
       </li>
     );
 
-    this.props.onSetInstructions({
+    this.props.setInstructions({
       step: 'defense construction',
       instructions: instructions
     });
@@ -684,10 +606,10 @@ class PlayerPhase extends Component {
   proceedHandler = stage => {
     if (stage === 'no fleet encounter') {
       /* go to homeworld invasion */
-      this.props.onAdvanceStep({ step: 'homeworld invasions' });
+      this.props.advanceStep({ step: 'homeworld invasions' });
     } else if (stage === 'no homeworld invasion') {
       /* advance to next econ phase */
-      this.props.onAdvancePhase();
+      this.props.advancePhase();
     } else {
     }
   };
@@ -758,10 +680,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onAdvancePhase: () => {
+    advancePhase: () => {
       dispatch({ type: actionTypes.ADVANCE_PHASE });
     },
-    onAdvanceStep: ({ step }) => {
+    advanceStep: ({ step }) => {
       dispatch({
         type: actionTypes.ADVANCE_STEP,
         payload: {
@@ -769,7 +691,7 @@ const mapDispatchToProps = dispatch => {
         }
       });
     },
-    onUpdateCurrentFleet: ({ step, alien, fleet }) => {
+    updateCurrentFleet: ({ step, alien, fleet }) => {
       dispatch({
         type: actionTypes.ADVANCE_STEP,
         payload: {
@@ -784,7 +706,7 @@ const mapDispatchToProps = dispatch => {
         }
       });
     },
-    onUpdateAliens: ({ aliens }) => {
+    updateAliens: ({ aliens }) => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
         payload: {
@@ -792,7 +714,27 @@ const mapDispatchToProps = dispatch => {
         }
       });
     },
-    onUpdatePlayerTech: ({ player }) => {
+    updateAliensAndSetInstructions: ({ aliens, step, instructions }) => {
+      dispatch({
+        type: actionTypes.UPDATE_ALIENS,
+        payload: {
+          aliens: aliens
+        }
+      });
+      dispatch({
+        type: actionTypes.ADVANCE_STEP,
+        payload: {
+          step: step
+        }
+      });
+      dispatch({
+        type: actionTypes.SET_INSTRUCTIONS,
+        payload: {
+          instructions: instructions
+        }
+      });
+    },
+    updatePlayerTech: ({ player }) => {
       dispatch({
         type: actionTypes.UPDATE_PLAYER_TECH,
         payload: {
@@ -800,7 +742,7 @@ const mapDispatchToProps = dispatch => {
         }
       });
     },
-    onSetInstructions: ({ step, instructions }) => {
+    setInstructions: ({ step, instructions }) => {
       dispatch({
         type: actionTypes.ADVANCE_STEP,
         payload: {

@@ -27,6 +27,11 @@ const reducer = (state = initialState, action) => {
         currentAlien: action.payload.alien,
         currentFleet: action.payload.fleet
       };
+    case actionTypes.UPDATE_ALIEN:
+      return {
+        ...state,
+        aliens: action.payload.aliens
+      };
     case actionTypes.UPDATE_ALIENS:
       return {
         ...state,
