@@ -3,7 +3,7 @@ import * as actionTypes from '../actions';
 const initialState = {
   turn: 0,
   phase: 'alien',
-  step: 'homeworld invasions'
+  step: 'check for fleets'
 };
 
 const reducer = (state = initialState, action) => {

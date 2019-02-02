@@ -14,6 +14,7 @@ class AlienPhase extends Component {
 
   getInstructions = (turn, player, aliens, cp) => {
     let instructions = [];
+    let step = '';
     let fleetLaunchTarget = 0;
     let launchModifier = 0;
     let fleetLaunched = false;
@@ -316,10 +317,15 @@ class AlienPhase extends Component {
       }
     }
 
+    if (fleetLaunched) {
+      step = 'fleet encounters';
+    } else {
+      step = 'check for fleets';
+    }
+
     this.props.updateAliens({
       aliens: aliens,
-      fleetLaunched: fleetLaunched,
-      step: 'fleet encounters'
+      step: step
     });
 
     return instructions;
@@ -367,7 +373,6 @@ const mapStateToProps = state => {
   return {
     cpPerTurn: state.aliens.cpPerTurn,
     aliens: state.aliens.aliens,
-    fleetLaunched: state.aliens.fleetLaunched,
     player: state.player.player,
     turn: state.turn.turn,
     step: state.turn.step,
@@ -385,23 +390,9 @@ const mapDispatchToProps = dispatch => {
         }
       });
       dispatch({
-        type: actionTypes.SET_FLEET_LAUNCHED,
-        payload: {
-          fleetLaunched: fleetLaunched
-        }
-      });
-      dispatch({
         type: actionTypes.ADVANCE_STEP,
         payload: {
           step: step
-        }
-      });
-    },
-    setFleetLaunched: ({ fleetLaunched }) => {
-      dispatch({
-        type: actionTypes.SET_FLEET_LAUNCHED,
-        payload: {
-          fleetLaunched: fleetLaunched
         }
       });
     },

@@ -718,7 +718,6 @@ class PlayerPhase extends Component {
       } else {
         this.props.updateAliensAndAdvancePhase({
           aliens: aliens,
-          step: 'homeworld invasions',
           instructions: ''
         });
       }
@@ -854,8 +853,17 @@ class PlayerPhase extends Component {
   };
 
   render() {
-    const step = this.props.step;
+    let step = this.props.step;
     let stepComponents;
+
+    if (step === 'check for fleets') {
+      let fleetsExist = this.checkForFleets();
+      if (fleetsExist) {
+        step = 'fleet encounters';
+      } else {
+        step = 'homeworld invasions';
+      }
+    }
 
     if (step === 'fleet encounters') {
       stepComponents = (
@@ -972,17 +980,11 @@ const mapDispatchToProps = dispatch => {
         }
       });
     },
-    updateAliensAndAdvancePhase: ({ aliens, step, instructions }) => {
+    updateAliensAndAdvancePhase: ({ aliens, instructions }) => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
         payload: {
           aliens: aliens
-        }
-      });
-      dispatch({
-        type: actionTypes.ADVANCE_STEP,
-        payload: {
-          step: step
         }
       });
       dispatch({
@@ -991,6 +993,7 @@ const mapDispatchToProps = dispatch => {
           instructions: instructions
         }
       });
+      dispatch({ type: actionTypes.ADVANCE_PHASE });
     },
     updateAliensAndSetInstructions: ({
       aliens,

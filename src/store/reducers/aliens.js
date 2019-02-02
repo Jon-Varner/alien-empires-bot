@@ -51,8 +51,7 @@ const initialState = {
     }
   ],
   currentAlien: {},
-  currentFleet: {},
-  fleetLaunched: false
+  currentFleet: {}
 };
 
 const reducer = (state = initialState, action) => {
@@ -62,11 +61,6 @@ const reducer = (state = initialState, action) => {
         ...state,
         cpPerTurn: action.payload.cpPerTurn,
         aliens: action.payload.aliens
-      };
-    case actionTypes.SET_FLEET_LAUNCHED:
-      return {
-        ...state,
-        fleetLaunched: action.payload.fleetLaunched
       };
     case actionTypes.SET_CURRENT_ALIEN_AND_FLEET:
       return {
