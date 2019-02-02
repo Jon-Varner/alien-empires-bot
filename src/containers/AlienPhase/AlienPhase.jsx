@@ -24,6 +24,9 @@ class AlienPhase extends Component {
     for (let i = 0; i < aliens.length; i++) {
       const alien = aliens[i];
 
+      /* Reset invasions */
+      alien.invaded = false;
+
       /* Always add an econ roll on these turns */
       const addedRolls = [3, 6, 10, 15];
       if (addedRolls.includes(turn)) {
@@ -65,7 +68,7 @@ class AlienPhase extends Component {
             } else if (currentRoll < 9) {
               alien.techcp += cp;
             } else {
-              alien.defcp += cp;
+              alien.defensecp += 2 * cp;
             }
             break;
           case 4:
@@ -76,7 +79,7 @@ class AlienPhase extends Component {
             } else if (currentRoll < 9) {
               alien.techcp += cp;
             } else {
-              alien.defcp += cp;
+              alien.defensecp += 2 * cp;
             }
             break;
           case 5:
@@ -87,7 +90,7 @@ class AlienPhase extends Component {
             } else if (currentRoll < 10) {
               alien.techcp += cp;
             } else {
-              alien.defcp += cp;
+              alien.defensecp += 2 * cp;
             }
             break;
           case 6:
@@ -98,7 +101,7 @@ class AlienPhase extends Component {
             } else if (currentRoll < 10) {
               alien.techcp += cp;
             } else {
-              alien.defcp += cp;
+              alien.defensecp += 2 * cp;
             }
             break;
           case 7:
@@ -109,7 +112,7 @@ class AlienPhase extends Component {
             } else if (currentRoll < 10) {
               alien.techcp += cp;
             } else {
-              alien.defcp += cp;
+              alien.defensecp += 2 * cp;
             }
             break;
           case 10:
@@ -120,7 +123,7 @@ class AlienPhase extends Component {
             } else if (currentRoll < 10) {
               alien.techcp += cp;
             } else {
-              alien.defcp += cp;
+              alien.defensecp += 2 * cp;
             }
             break;
           case 13:
@@ -255,7 +258,8 @@ class AlienPhase extends Component {
               battleships: 0,
               dreadnaughts: 0,
               carriers: 0,
-              fighters: 0
+              fighters: 0,
+              invaded: false
             });
 
             alien.fleetcp = 0;

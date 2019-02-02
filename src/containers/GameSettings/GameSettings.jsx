@@ -29,7 +29,8 @@ class GameSettings extends Component {
         attack: 0,
         defense: 0,
         tactics: 0,
-        exploration: 0,
+        mines: 0,
+        bases: 0,
         fleets: []
       });
     }

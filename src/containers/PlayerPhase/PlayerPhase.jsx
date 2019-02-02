@@ -7,6 +7,9 @@ import FleetEncounter from '../../components/FleetEncounter/FleetEncounter';
 import PlayerTechReveal from '../../components/PlayerTechReveal/PlayerTechReveal';
 import FleetConstruction from '../../components/FleetConstruction/FleetConstruction';
 import HomeworldInvasion from '../../components/HomeworldInvasion/HomeworldInvasion';
+import HomeworldElimination from '../../components/HomeworldElimination/HomeworldElimination';
+import HomeworldDefenseConstruction from '../../components/HomeworldDefenseConstruction/HomeworldDefenseConstruction';
+import GameOver from '../../components/GameOver/GameOver';
 
 import * as actionTypes from '../../store/actions';
 
@@ -43,10 +46,34 @@ class PlayerPhase extends Component {
     });
 
     if (allFleets.length > 0) {
-      return allFleets;
-    } else {
-      return null;
+      return true;
     }
+
+    return false;
+  };
+
+  checkForInvaded = aliens => {
+    let invaded = false;
+
+    aliens.forEach(alien => {
+      if (alien.invaded) {
+        invaded = true;
+      }
+    });
+
+    return invaded;
+  };
+
+  checkForUninvaded = aliens => {
+    let uninvaded = false;
+
+    aliens.forEach(alien => {
+      if (!alien.invaded) {
+        uninvaded = true;
+      }
+    });
+
+    return uninvaded;
   };
 
   fleetEncounteredHandler = (alienId, fleetId) => {
@@ -383,7 +410,6 @@ class PlayerPhase extends Component {
               break;
             default:
               /* This should be impossible to reach */
-              console.log('IMPOSSIBLE!');
               techSelected = true;
           }
         }
@@ -393,8 +419,6 @@ class PlayerPhase extends Component {
     /* First attempt to build a fleet of carriers and fighters */
 
     currentRoll = this.rollDie();
-
-    console.log('Current roll = ' + currentRoll);
 
     while (
       fleet.cp > 27 &&
@@ -634,21 +658,158 @@ class PlayerPhase extends Component {
 
     this.props.updateAliensAndSetInstructions({
       aliens: aliens,
+      alien: alien,
+      fleet: fleet,
       step: 'fleet construction',
       instructions: instructions
     });
   };
 
   fleetConstructedHandler = () => {
-    let fleetsExist = null;
-    let step = 'homeworld invasions';
+    const aliens = [...this.props.aliens];
+    let uninvaded = false;
+    let step = '';
 
     /* Check for existing fleets */
-    fleetsExist = this.checkForFleets();
+    const fleetsExist = this.checkForFleets();
 
-    if (fleetsExist !== null) {
+    if (fleetsExist) {
       step = 'fleet encounters';
+    } else {
+      uninvaded = this.checkForUninvaded(aliens);
+
+      if (uninvaded) {
+        step = 'homeworld invasions';
+      }
     }
+
+    if (step === '') {
+      this.props.advancePhase();
+    } else {
+      this.props.setInstructions({
+        step: step,
+        instructions: []
+      });
+    }
+  };
+
+  homeworldEliminatedHandler = alienId => {
+    const aliens = [...this.props.aliens];
+
+    const index = aliens.findIndex(item => item.id === alienId);
+    aliens.splice(index, 1);
+
+    if (aliens.length === 0) {
+      this.props.setInstructions({
+        step: 'game over',
+        instructions: []
+      });
+    } else {
+      const invaded = this.checkForInvaded(aliens);
+
+      if (invaded) {
+        this.props.updateAliensAndSetInstructions({
+          aliens: aliens,
+          alien: this.props.currentAlien,
+          fleet: this.props.currentFleet,
+          step: 'homeworld eliminations',
+          instructions: ''
+        });
+      } else {
+        this.props.updateAliensAndAdvancePhase({
+          aliens: aliens,
+          step: 'homeworld invasions',
+          instructions: ''
+        });
+      }
+    }
+  };
+
+  homeworldInvadedHandler = alienId => {
+    const aliens = [...this.props.aliens];
+    const fleet = { ...this.props.currentFleet };
+    const instructions = [];
+    let currentRoll = 0;
+
+    /* Look up this alien ID and get its defensecp */
+    const alien = aliens.find(alien => alien.id === alienId);
+
+    alien.invaded = true;
+
+    /* Only report new mines and bases to be added */
+    alien.mines = 0;
+    alien.bases = 0;
+
+    /* Calculate defenses */
+    currentRoll = this.rollDie();
+
+    if (currentRoll < 4) {
+      /* Just buy mines */
+      while (alien.defensecp > 4) {
+        alien.mines += 1;
+        alien.defensecp -= 5;
+      }
+    } else if (currentRoll > 7) {
+      /* Buy as many bases as possible, then mines */
+      while (alien.defensecp > 11) {
+        alien.bases += 1;
+        alien.defensecp -= 12;
+      }
+
+      while (alien.defensecp > 4) {
+        alien.mines += 1;
+        alien.defensecp -= 5;
+      }
+    } else {
+      /* Alternate bases and mines, then get mines until broke */
+      let purchased = '';
+
+      while (alien.defensecp > 11) {
+        if (purchased === 'base') {
+          alien.mines += 1;
+          alien.defensecp -= 5;
+          purchased = 'mine';
+        } else {
+          alien.bases += 1;
+          alien.defensecp -= 12;
+          purchased = 'base';
+        }
+      }
+
+      while (alien.defensecp > 4) {
+        alien.mines += 1;
+        alien.defensecp -= 5;
+      }
+    }
+
+    /* Then constructFleet */
+
+    instructions.push(
+      <li>
+        Add {alien.bases} bases and {alien.mines} mines to the{' '}
+        <span className={alien.color}>{alien.color}</span> homeworld.
+      </li>
+    );
+
+    this.props.updateAliensAndSetInstructions({
+      aliens: aliens,
+      alien: alien,
+      fleet: fleet,
+      step: 'homeworld defense construction',
+      instructions: instructions
+    });
+  };
+
+  homeworldDefenseConstructedHandler = () => {
+    const aliens = [...this.props.aliens];
+
+    let step = 'homeworld eliminations';
+
+    aliens.forEach(alien => {
+      if (alien.invaded === false) {
+        step = 'homeworld invasions';
+      }
+    });
 
     /* return to encounter phase */
     this.props.setInstructions({
@@ -657,34 +818,38 @@ class PlayerPhase extends Component {
     });
   };
 
-  homeworldInvadedHandler = alienId => {
+  proceedHandler = step => {
     const aliens = [...this.props.aliens];
-    const instructions = [];
 
-    /* Look up this alien ID and get its defensecp */
-    const alien = aliens.find(alien => alien.id === alienId);
-
-    instructions.push(
-      <li>
-        <span className={alien.color}>{alien.color}</span> has defense of{' '}
-        {alien.defenseCp}.
-      </li>
-    );
-
-    this.props.setInstructions({
-      step: 'defense construction',
-      instructions: instructions
-    });
-  };
-
-  proceedHandler = stage => {
-    if (stage === 'no fleet encounter') {
-      /* go to homeworld invasion */
-      this.props.advanceStep({ step: 'homeworld invasions' });
-    } else if (stage === 'no homeworld invasion') {
+    if (step === 'no homeworld elimination') {
       /* advance to next econ phase */
       this.props.advancePhase();
+    } else if (step === 'no homeworld invasion') {
+      /* advance to elimination check or next phase */
+      const invaded = this.checkForInvaded(aliens);
+
+      if (invaded) {
+        this.props.advanceStep({ step: 'homeworld eliminations' });
+      } else {
+        this.props.advancePhase();
+      }
+    } else if (step === 'no fleet encounter') {
+      this.props.advanceStep({ step: 'homeworld invasions' });
     } else {
+      const fleetsExist = this.checkForFleets();
+
+      if (fleetsExist) {
+        this.props.advanceStep({ step: 'fleet encounters' });
+      } else {
+        const uninvaded = this.checkForUninvaded(aliens);
+
+        if (uninvaded) {
+          this.props.advanceStep({ step: 'homeworld invasions' });
+        } else {
+          /* advance to next econ phase */
+          this.props.advancePhase();
+        }
+      }
     }
   };
 
@@ -718,13 +883,32 @@ class PlayerPhase extends Component {
         />
       );
     } else if (step === 'homeworld invasions') {
+      const aliens = this.props.aliens.filter(alien => alien.invaded === false);
       stepComponents = (
         <HomeworldInvasion
-          aliens={this.props.aliens}
+          aliens={aliens}
           homeworldInvaded={this.homeworldInvadedHandler}
           proceed={this.proceedHandler}
         />
       );
+    } else if (step === 'homeworld defense construction') {
+      stepComponents = (
+        <HomeworldDefenseConstruction
+          instructions={this.props.instructions}
+          homeworldDefenseConstructed={this.homeworldDefenseConstructedHandler}
+        />
+      );
+    } else if (step === 'homeworld eliminations') {
+      const aliens = this.props.aliens.filter(alien => alien.invaded === true);
+      stepComponents = (
+        <HomeworldElimination
+          aliens={aliens}
+          homeworldEliminated={this.homeworldEliminatedHandler}
+          proceed={this.proceedHandler}
+        />
+      );
+    } else if (step === 'game over') {
+      stepComponents = <GameOver />;
     } else {
       console.log('UNHANDLED EXCEPTION');
       stepComponents = (
@@ -788,11 +972,44 @@ const mapDispatchToProps = dispatch => {
         }
       });
     },
-    updateAliensAndSetInstructions: ({ aliens, step, instructions }) => {
+    updateAliensAndAdvancePhase: ({ aliens, step, instructions }) => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
         payload: {
           aliens: aliens
+        }
+      });
+      dispatch({
+        type: actionTypes.ADVANCE_STEP,
+        payload: {
+          step: step
+        }
+      });
+      dispatch({
+        type: actionTypes.SET_INSTRUCTIONS,
+        payload: {
+          instructions: instructions
+        }
+      });
+    },
+    updateAliensAndSetInstructions: ({
+      aliens,
+      alien,
+      fleet,
+      step,
+      instructions
+    }) => {
+      dispatch({
+        type: actionTypes.UPDATE_ALIENS,
+        payload: {
+          aliens: aliens
+        }
+      });
+      dispatch({
+        type: actionTypes.SET_CURRENT_ALIEN_AND_FLEET,
+        payload: {
+          alien: alien,
+          fleet: fleet
         }
       });
       dispatch({
