@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import uuid from 'uuid';
 
 import * as actionTypes from '../../store/actions';
 
@@ -137,9 +138,9 @@ class GameSettings extends Component {
 
         <label>Alien Empire colors:</label>
         <ul>
-          {aliens.map((alien, index) => {
+          {aliens.map(alien => {
             return (
-              <li className={classes.alien} key={index}>
+              <li className={classes.alien} key={uuid.v4()}>
                 <select
                   id={alien.id}
                   value={alien.color}

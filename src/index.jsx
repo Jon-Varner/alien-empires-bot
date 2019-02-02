@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
+import { devToolsEnhancer } from 'redux-devtools-extension';
 
 import App from './App';
 import turnReducer from './store/reducers/turn';
@@ -18,7 +19,7 @@ const rootReducer = combineReducers({
   instructions: instructionsReducer
 });
 
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, devToolsEnhancer());
 
 render(
   <Provider store={store}>

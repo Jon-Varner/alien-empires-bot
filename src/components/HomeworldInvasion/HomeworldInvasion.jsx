@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import uuid from 'uuid';
 
 import Aux from '../../hoc/Auxiliary';
 
@@ -7,8 +8,8 @@ const homeworldInvasion = props => (
   <Aux>
     <p>Did you invade an alien homeworld?</p>
     <ul>
-      {props.aliens.map((alien, index) => (
-        <li key={index}>
+      {props.aliens.map(alien => (
+        <li key={uuid.v4()}>
           <button
             className={alien.color}
             onClick={() => {

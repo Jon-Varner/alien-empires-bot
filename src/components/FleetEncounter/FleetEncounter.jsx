@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import uuid from 'uuid';
 
 import Aux from '../../hoc/Auxiliary';
 
@@ -34,8 +35,8 @@ class FleetEncounter extends Component {
       <Aux>
         <p>Did you encounter an unbuilt alien fleet?</p>
         <ul>
-          {this.state.fleets.map((fleet, index) => (
-            <li key={index}>
+          {this.state.fleets.map(fleet => (
+            <li key={uuid.v4()}>
               <button
                 className={fleet.color}
                 onClick={() => {
