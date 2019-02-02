@@ -318,7 +318,8 @@ class AlienPhase extends Component {
 
     this.props.updateAliens({
       aliens: aliens,
-      fleetLaunched: fleetLaunched
+      fleetLaunched: fleetLaunched,
+      step: 'fleet encounters'
     });
 
     return instructions;
@@ -376,7 +377,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateAliens: ({ aliens, fleetLaunched }) => {
+    updateAliens: ({ aliens, fleetLaunched, step }) => {
       dispatch({
         type: actionTypes.UPDATE_ALIENS,
         payload: {
@@ -387,6 +388,12 @@ const mapDispatchToProps = dispatch => {
         type: actionTypes.SET_FLEET_LAUNCHED,
         payload: {
           fleetLaunched: fleetLaunched
+        }
+      });
+      dispatch({
+        type: actionTypes.ADVANCE_STEP,
+        payload: {
+          step: step
         }
       });
     },
