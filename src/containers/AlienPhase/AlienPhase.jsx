@@ -259,8 +259,7 @@ class AlienPhase extends Component {
               battleships: 0,
               dreadnaughts: 0,
               carriers: 0,
-              fighters: 0,
-              invaded: false
+              fighters: 0
             });
 
             alien.fleetcp = 0;

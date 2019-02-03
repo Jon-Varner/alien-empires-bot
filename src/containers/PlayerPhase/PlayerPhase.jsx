@@ -123,13 +123,47 @@ class PlayerPhase extends Component {
     });
   };
 
-  constructFleet = () => {
+  constructFleetHandler = () => {
+    this.constructFleet('offensive');
+  };
+
+  constructFleet = (fleetType, defendingAlien, defenseInstructions) => {
     const aliens = [...this.props.aliens];
-    const alien = { ...this.props.currentAlien };
-    const fleet = { ...this.props.currentFleet };
     const player = { ...this.props.player };
-    const instructions = [];
+    let instructions = [];
     let currentRoll = 0;
+    let defensive = false;
+    let step = '';
+    let alien = {};
+    let fleet = {};
+
+    if (fleetType === 'defensive') {
+      defensive = true;
+      alien = defendingAlien;
+      const fleetID = alien.fleets.length + 1;
+
+      fleet = {
+        id: fleetID,
+        cp: alien.fleetcp,
+        encountered: true,
+        raiders: 0,
+        scouts: 0,
+        destroyers: 0,
+        cruisers: 0,
+        battlecruisers: 0,
+        battleships: 0,
+        dreadnaughts: 0,
+        carriers: 0,
+        fighters: 0
+      };
+
+      alien.fleets.push(fleet);
+
+      instructions = [...defenseInstructions];
+    } else {
+      alien = { ...this.props.currentAlien };
+      fleet = { ...this.props.currentFleet };
+    }
 
     /* The following calculations and priorities are implementations of the scenario rules */
     if (player.fighters > 0 && alien.pointDefense === 0 && alien.techcp > 19) {
@@ -187,15 +221,10 @@ class PlayerPhase extends Component {
         }
         break;
       default:
-        /* This should be impossible to reach */
-        console.log('IMPOSSIBLE!');
+      /* This should be impossible to reach */
     }
 
-    console.log('Current alien tech CP is ' + alien.techcp);
-
     currentRoll = this.rollDie();
-
-    console.log('Current roll = ' + currentRoll);
 
     if (
       alien.fighters > 0 &&
@@ -205,14 +234,9 @@ class PlayerPhase extends Component {
     ) {
       alien.fighters += 1;
       alien.techcp -= 25;
-      console.log(
-        'Die roll under 7 and alien has fighters, so alien spent 25 to upgrade fighters'
-      );
     }
 
     currentRoll = this.rollDie();
-
-    console.log('Current roll = ' + currentRoll);
 
     if (
       fleet.raiders > 0 &&
@@ -222,28 +246,20 @@ class PlayerPhase extends Component {
     ) {
       alien.cloaking = 2;
       alien.techcp -= 30;
-      console.log(
-        'Die roll under 7 and alien fleet is raiders, so alien spent 30 to upgrade cloaking'
-      );
     }
-
-    console.log('Current alien tech CP is ' + alien.techcp);
 
     if (alien.techcp > 9) {
       if (alien.techcp < 15 && alien.minesweeper < 2) {
         alien.minesweeper += 1;
         alien.techcp -= 10;
-        console.log('Alien researched minesweeping for 10');
       } else if (alien.techcp < 20 && alien.attack > 1 && alien.defense > 1) {
         alien.tactics += 1;
         alien.techcp -= 15;
-        console.log('Alien researched tactics for 15');
       } else {
         let techSelected = false;
 
         while (!techSelected) {
           currentRoll = this.rollDie();
-          console.log('Current roll = ' + currentRoll);
 
           switch (currentRoll) {
             case 1:
@@ -262,10 +278,6 @@ class PlayerPhase extends Component {
                   alien.attack += 1;
                   alien.techcp -= attackCost;
                   techSelected = true;
-                  console.log(
-                    'Die roll was 1/2 so Alien researched attack for ' +
-                      attackCost
-                  );
                 }
               }
               break;
@@ -286,10 +298,6 @@ class PlayerPhase extends Component {
                   alien.defense += 1;
                   alien.techcp -= defenseCost;
                   techSelected = true;
-                  console.log(
-                    'Die roll was 3/4 so Alien researched defense for ' +
-                      defenseCost
-                  );
                 }
               }
               break;
@@ -307,10 +315,6 @@ class PlayerPhase extends Component {
                   alien.attack += 1;
                   alien.techcp -= attackCost;
                   techSelected = true;
-                  console.log(
-                    'Die roll was 5 BUT attack < 2 so Alien researched attack for ' +
-                      attackCost
-                  );
                 }
               } else if (alien.defense < 2) {
                 let defenseCost = 20;
@@ -323,18 +327,11 @@ class PlayerPhase extends Component {
                   alien.defense += 1;
                   alien.techcp -= defenseCost;
                   techSelected = true;
-                  console.log(
-                    'Die roll was 5 BUT defense < 2 so Alien researched defense for ' +
-                      defenseCost
-                  );
                 }
               } else if (alien.tactics < 3 && alien.techcp > 14) {
                 alien.tactics += 1;
                 alien.techcp -= 15;
                 techSelected = true;
-                console.log(
-                  'Die roll was 5 so Alien researched tactics for 15'
-                );
               }
               break;
             case 6:
@@ -348,9 +345,6 @@ class PlayerPhase extends Component {
                 alien.cloaking += 1;
                 alien.techcp -= 30;
                 techSelected = true;
-                console.log(
-                  'Die roll was 6 so Alien researched cloaking for 30'
-                );
               }
               break;
             case 7:
@@ -360,9 +354,6 @@ class PlayerPhase extends Component {
                 alien.scanners += 1;
                 alien.techcp -= 20;
                 techSelected = true;
-                console.log(
-                  'Die roll was 7 so Alien researched scanners for 20'
-                );
               }
               break;
             case 8:
@@ -372,9 +363,6 @@ class PlayerPhase extends Component {
                 alien.fighters += 1;
                 alien.techcp -= 25;
                 techSelected = true;
-                console.log(
-                  'Die roll was 8 so Alien researched fighters for 25'
-                );
               }
               break;
             case 9:
@@ -384,9 +372,6 @@ class PlayerPhase extends Component {
                 alien.pointDefense += 1;
                 alien.techcp -= 20;
                 techSelected = true;
-                console.log(
-                  'Die roll was 9 so Alien researched point defense for 20'
-                );
               }
               break;
             case 10:
@@ -396,16 +381,10 @@ class PlayerPhase extends Component {
                 alien.minesweeper += 1;
                 alien.techcp -= 10;
                 techSelected = true;
-                console.log(
-                  'Die roll was 10 so Alien researched minesweeper for 10'
-                );
               } else if (alien.minesweeper === 1 && alien.techcp > 14) {
                 alien.minesweeper += 1;
                 alien.techcp -= 15;
                 techSelected = true;
-                console.log(
-                  'Die roll was 10 so Alien researched minesweeper 2 for 15'
-                );
               }
               break;
             default:
@@ -421,6 +400,7 @@ class PlayerPhase extends Component {
     currentRoll = this.rollDie();
 
     while (
+      defensive === false &&
       fleet.cp > 27 &&
       alien.fighters > 0 &&
       (player.pointDefense === 0 || currentRoll < 5)
@@ -433,6 +413,7 @@ class PlayerPhase extends Component {
     /* Next attempt to build a fleet of raiders */
 
     if (
+      defensive === false &&
       fleet.carrier === false &&
       fleet.cp > 11 &&
       alien.cloaking > player.scanners
@@ -486,8 +467,6 @@ class PlayerPhase extends Component {
       }
 
       currentRoll = this.rollDie();
-
-      console.log('Current roll = ' + currentRoll);
 
       /* Get minimal number of Scouts needed */
       if (
@@ -656,11 +635,17 @@ class PlayerPhase extends Component {
       }
     }
 
+    if (defensive) {
+      step = 'homeworld defense construction';
+    } else {
+      step = 'fleet construction';
+    }
+
     this.props.updateAliensAndSetInstructions({
       aliens: aliens,
       alien: alien,
       fleet: fleet,
-      step: 'fleet construction',
+      step: step,
       instructions: instructions
     });
   };
@@ -704,6 +689,14 @@ class PlayerPhase extends Component {
         step: 'game over',
         instructions: []
       });
+
+      this.props.updateAliensAndSetInstructions({
+        aliens: aliens,
+        alien: this.props.currentAlien,
+        fleet: this.props.currentFleet,
+        step: 'game over',
+        instructions: []
+      });
     } else {
       const invaded = this.checkForInvaded(aliens);
 
@@ -713,12 +706,12 @@ class PlayerPhase extends Component {
           alien: this.props.currentAlien,
           fleet: this.props.currentFleet,
           step: 'homeworld eliminations',
-          instructions: ''
+          instructions: []
         });
       } else {
         this.props.updateAliensAndAdvancePhase({
           aliens: aliens,
-          instructions: ''
+          instructions: []
         });
       }
     }
@@ -726,7 +719,6 @@ class PlayerPhase extends Component {
 
   homeworldInvadedHandler = alienId => {
     const aliens = [...this.props.aliens];
-    const fleet = { ...this.props.currentFleet };
     const instructions = [];
     let currentRoll = 0;
 
@@ -781,8 +773,6 @@ class PlayerPhase extends Component {
       }
     }
 
-    /* Then constructFleet */
-
     instructions.push(
       <li>
         Add {alien.bases} bases and {alien.mines} mines to the{' '}
@@ -790,13 +780,8 @@ class PlayerPhase extends Component {
       </li>
     );
 
-    this.props.updateAliensAndSetInstructions({
-      aliens: aliens,
-      alien: alien,
-      fleet: fleet,
-      step: 'homeworld defense construction',
-      instructions: instructions
-    });
+    /* Then constructFleet */
+    this.constructFleet('defensive', alien, instructions);
   };
 
   homeworldDefenseConstructedHandler = () => {
@@ -880,7 +865,7 @@ class PlayerPhase extends Component {
         <PlayerTechReveal
           player={this.props.player}
           playerTechUpdated={this.playerTechUpdatedHandler}
-          proceed={this.constructFleet}
+          proceed={this.constructFleetHandler}
         />
       );
     } else if (step === 'fleet construction') {
@@ -918,7 +903,6 @@ class PlayerPhase extends Component {
     } else if (step === 'game over') {
       stepComponents = <GameOver />;
     } else {
-      console.log('UNHANDLED EXCEPTION');
       stepComponents = (
         <Instructions
           instructions={this.props.instructions}
