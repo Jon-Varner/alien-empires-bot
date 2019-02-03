@@ -12,6 +12,8 @@
 
 <p>All calculations are hidden from the user. This keeps the interface clean and simple and makes the alien empires more challenging, since you no longer see their capabilities until you encounter them in the game.</p>
 
+<p>The alien empires choose their fleet technologies whenever a fleet is encountered. The toggle drawer at the bottom of the screen shows all of the aliens' current technology levels.</p>
+
 <h2>What doesn't it do?</h2>
 
 <p>You'll still need to move the alien fleets once they have been launched. Since the spaces on the board are randomized every game, this would be nearly impossible to anticipate or enter into an app!</p>
@@ -24,9 +26,7 @@
 
 <ol>
   <li>Currently, the app only constructs 4 types of fleets: Raiders, Carriers, "Biggest Ships Possible", and "Most Ships Possible". The final type of fleet, "Balanced" is a more complicated algorithm, but I'll get it done soon.</li>
-  <li>I plan to add an always accessible menu for viewing the alien empires' current technology status.</p>
   <li>There is currently no way to save game state--if you refresh the page, you'll begin a new game. I may implement a database at some point, which would necessitate some form of user login or at least cookies.</li>
-  <li>Eventually, I might add a "verbose" mode that displays all of the "die rolls" and tech assignments. For now, I wanted to keep the experience as clean and simple as possible, so I hid all of that information.</li>
 </ol>
 
 <h2>What technology did you use?</h2>

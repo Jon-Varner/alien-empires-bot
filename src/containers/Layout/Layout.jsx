@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 import Aux from '../../hoc/Auxiliary';
 import Header from '../../components/Header/Header';
 import GameSettings from '../../containers/GameSettings/GameSettings';
+import AlienTechList from '../../components/AlienTechList/AlienTechList';
 import Turn from '../../components/Turn/Turn';
+
+import * as actionTypes from '../../store/actions';
 
 class Layout extends Component {
   displayHeadline = () => {
@@ -20,11 +23,23 @@ class Layout extends Component {
     return headline;
   };
 
+  toggleDrawerHandler = () => {
+    this.props.toggleDrawer();
+  };
+
   render() {
     let current;
+    let footer;
 
     if (this.props.turn > 0) {
       current = <Turn phase={this.props.phase} />;
+      footer = (
+        <AlienTechList
+          aliens={this.props.aliens}
+          footerClass={this.props.footerClass}
+          toggled={this.toggleDrawerHandler}
+        />
+      );
     } else {
       current = <GameSettings />;
     }
@@ -33,6 +48,7 @@ class Layout extends Component {
       <Aux>
         <Header headline={this.displayHeadline()} />
         <main>{current}</main>
+        {footer}
       </Aux>
     );
   }
@@ -41,8 +57,21 @@ class Layout extends Component {
 const mapStateToProps = state => {
   return {
     turn: state.turn.turn,
-    phase: state.turn.phase
+    phase: state.turn.phase,
+    aliens: state.aliens.aliens,
+    footerClass: state.interface.footerClass
   };
 };
 
-export default connect(mapStateToProps)(Layout);
+const mapDispatchToProps = dispatch => {
+  return {
+    toggleDrawer: () => {
+      dispatch({ type: actionTypes.TOGGLE_DRAWER });
+    }
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Layout);
