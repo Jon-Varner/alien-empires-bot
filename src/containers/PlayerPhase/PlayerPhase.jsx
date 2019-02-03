@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import { rollDie, pluralize } from '../../utils/utils';
+import {
+  checkForFleets,
+  checkForInvaded,
+  checkForUninvaded
+} from '../../utils/status';
 import Aux from '../../hoc/Auxiliary';
 import Instructions from '../../components/Instructions/Instructions';
 import FleetEncounter from '../../components/FleetEncounter/FleetEncounter';
@@ -14,68 +20,6 @@ import GameOver from '../../components/GameOver/GameOver';
 import * as actionTypes from '../../store/actions';
 
 class PlayerPhase extends Component {
-  /* the game always uses a single 10-sided die */
-  rollDie = () => {
-    return Math.floor(Math.random() * Math.floor(11));
-  };
-
-  pluralize = (ship, count) => {
-    if (count > 1) {
-      return ship + 's';
-    } else {
-      return ship;
-    }
-  };
-
-  checkForFleets = () => {
-    const aliens = [...this.props.aliens];
-    const allFleets = [];
-
-    aliens.forEach(alien => {
-      const fleets = [...alien.fleets];
-
-      fleets.forEach(fleet => {
-        if (fleet.encountered === false) {
-          allFleets.push({
-            color: alien.color,
-            alienId: alien.id,
-            fleetId: fleet.id
-          });
-        }
-      });
-    });
-
-    if (allFleets.length > 0) {
-      return true;
-    }
-
-    return false;
-  };
-
-  checkForInvaded = aliens => {
-    let invaded = false;
-
-    aliens.forEach(alien => {
-      if (alien.invaded) {
-        invaded = true;
-      }
-    });
-
-    return invaded;
-  };
-
-  checkForUninvaded = aliens => {
-    let uninvaded = false;
-
-    aliens.forEach(alien => {
-      if (!alien.invaded) {
-        uninvaded = true;
-      }
-    });
-
-    return uninvaded;
-  };
-
   fleetEncounteredHandler = (alienId, fleetId) => {
     /*
     show screen with select boxes for all player techs
@@ -176,7 +120,7 @@ class PlayerPhase extends Component {
       alien.techcp -= 10;
     }
 
-    currentRoll = this.rollDie();
+    currentRoll = rollDie();
 
     while (
       player.cloaking > alien.scanners &&
@@ -187,7 +131,7 @@ class PlayerPhase extends Component {
       alien.techcp -= 20;
     }
 
-    currentRoll = this.rollDie();
+    currentRoll = rollDie();
 
     switch (alien.shipSize) {
       case 1:
@@ -224,7 +168,7 @@ class PlayerPhase extends Component {
       /* This should be impossible to reach */
     }
 
-    currentRoll = this.rollDie();
+    currentRoll = rollDie();
 
     if (
       alien.fighters > 0 &&
@@ -236,7 +180,7 @@ class PlayerPhase extends Component {
       alien.techcp -= 25;
     }
 
-    currentRoll = this.rollDie();
+    currentRoll = rollDie();
 
     if (
       fleet.raiders > 0 &&
@@ -259,7 +203,7 @@ class PlayerPhase extends Component {
         let techSelected = false;
 
         while (!techSelected) {
-          currentRoll = this.rollDie();
+          currentRoll = rollDie();
 
           switch (currentRoll) {
             case 1:
@@ -397,7 +341,7 @@ class PlayerPhase extends Component {
 
     /* First attempt to build a fleet of carriers and fighters */
 
-    currentRoll = this.rollDie();
+    currentRoll = rollDie();
 
     while (
       defensive === false &&
@@ -466,7 +410,7 @@ class PlayerPhase extends Component {
         fleet.destroyers += 1;
       }
 
-      currentRoll = this.rollDie();
+      currentRoll = rollDie();
 
       /* Get minimal number of Scouts needed */
       if (
@@ -559,7 +503,7 @@ class PlayerPhase extends Component {
       instructions.push(
         <li>
           This is a fleet of {fleet.raiders}{' '}
-          {this.pluralize('raider', fleet.raiders)}
+          {pluralize('raider', fleet.raiders)}
         </li>
       );
     }
@@ -567,7 +511,7 @@ class PlayerPhase extends Component {
     if (fleet.carriers > 0) {
       instructions.push(
         <li>
-          Add {fleet.carriers} {this.pluralize('carrier', fleet.carriers)}
+          Add {fleet.carriers} {pluralize('carrier', fleet.carriers)}
         </li>
       );
     }
@@ -575,7 +519,7 @@ class PlayerPhase extends Component {
     if (fleet.fighters > 0) {
       instructions.push(
         <li>
-          Add {fleet.fighters} {this.pluralize('fighter', fleet.fighters)}
+          Add {fleet.fighters} {pluralize('fighter', fleet.fighters)}
         </li>
       );
     }
@@ -584,7 +528,7 @@ class PlayerPhase extends Component {
       instructions.push(
         <li>
           Add {fleet.dreadnaughts}{' '}
-          {this.pluralize('dreadnaught', fleet.dreadnaughts)}
+          {pluralize('dreadnaught', fleet.dreadnaughts)}
         </li>
       );
     }
@@ -592,8 +536,7 @@ class PlayerPhase extends Component {
     if (fleet.battleships > 0) {
       instructions.push(
         <li>
-          Add {fleet.battleships}{' '}
-          {this.pluralize('battleship', fleet.battleships)}
+          Add {fleet.battleships} {pluralize('battleship', fleet.battleships)}
         </li>
       );
     }
@@ -602,7 +545,7 @@ class PlayerPhase extends Component {
       instructions.push(
         <li>
           Add {fleet.battlecruisers}{' '}
-          {this.pluralize('battlecruiser', fleet.battlecruisers)}
+          {pluralize('battlecruiser', fleet.battlecruisers)}
         </li>
       );
     }
@@ -610,7 +553,7 @@ class PlayerPhase extends Component {
     if (fleet.cruisers > 0) {
       instructions.push(
         <li>
-          Add {fleet.cruisers} {this.pluralize('cruiser', fleet.cruisers)}
+          Add {fleet.cruisers} {pluralize('cruiser', fleet.cruisers)}
         </li>
       );
     }
@@ -618,7 +561,7 @@ class PlayerPhase extends Component {
     if (fleet.destroyers > 0) {
       instructions.push(
         <li>
-          Add {fleet.destroyers} {this.pluralize('destroyer', fleet.destroyers)}
+          Add {fleet.destroyers} {pluralize('destroyer', fleet.destroyers)}
         </li>
       );
     }
@@ -626,7 +569,7 @@ class PlayerPhase extends Component {
     if (fleet.scouts > 0) {
       instructions.push(
         <li>
-          Add {fleet.scouts} {this.pluralize('scout', fleet.scouts)}
+          Add {fleet.scouts} {pluralize('scout', fleet.scouts)}
         </li>
       );
 
@@ -656,12 +599,12 @@ class PlayerPhase extends Component {
     let step = '';
 
     /* Check for existing fleets */
-    const fleetsExist = this.checkForFleets();
+    const fleetsExist = checkForFleets(aliens);
 
     if (fleetsExist) {
       step = 'fleet encounters';
     } else {
-      uninvaded = this.checkForUninvaded(aliens);
+      uninvaded = checkForUninvaded(aliens);
 
       if (uninvaded) {
         step = 'homeworld invasions';
@@ -675,45 +618,6 @@ class PlayerPhase extends Component {
         step: step,
         instructions: []
       });
-    }
-  };
-
-  homeworldEliminatedHandler = alienId => {
-    const aliens = [...this.props.aliens];
-
-    const index = aliens.findIndex(item => item.id === alienId);
-    aliens.splice(index, 1);
-
-    if (aliens.length === 0) {
-      this.props.setInstructions({
-        step: 'game over',
-        instructions: []
-      });
-
-      this.props.updateAliensAndSetInstructions({
-        aliens: aliens,
-        alien: this.props.currentAlien,
-        fleet: this.props.currentFleet,
-        step: 'game over',
-        instructions: []
-      });
-    } else {
-      const invaded = this.checkForInvaded(aliens);
-
-      if (invaded) {
-        this.props.updateAliensAndSetInstructions({
-          aliens: aliens,
-          alien: this.props.currentAlien,
-          fleet: this.props.currentFleet,
-          step: 'homeworld eliminations',
-          instructions: []
-        });
-      } else {
-        this.props.updateAliensAndAdvancePhase({
-          aliens: aliens,
-          instructions: []
-        });
-      }
     }
   };
 
@@ -732,7 +636,7 @@ class PlayerPhase extends Component {
     alien.bases = 0;
 
     /* Calculate defenses */
-    currentRoll = this.rollDie();
+    currentRoll = rollDie();
 
     if (currentRoll < 4) {
       /* Just buy mines */
@@ -802,6 +706,45 @@ class PlayerPhase extends Component {
     });
   };
 
+  homeworldEliminatedHandler = alienId => {
+    const aliens = [...this.props.aliens];
+
+    const index = aliens.findIndex(item => item.id === alienId);
+    aliens.splice(index, 1);
+
+    if (aliens.length === 0) {
+      this.props.setInstructions({
+        step: 'game over',
+        instructions: []
+      });
+
+      this.props.updateAliensAndSetInstructions({
+        aliens: aliens,
+        alien: this.props.currentAlien,
+        fleet: this.props.currentFleet,
+        step: 'game over',
+        instructions: []
+      });
+    } else {
+      const invaded = checkForInvaded(aliens);
+
+      if (invaded) {
+        this.props.updateAliensAndSetInstructions({
+          aliens: aliens,
+          alien: this.props.currentAlien,
+          fleet: this.props.currentFleet,
+          step: 'homeworld eliminations',
+          instructions: []
+        });
+      } else {
+        this.props.updateAliensAndAdvancePhase({
+          aliens: aliens,
+          instructions: []
+        });
+      }
+    }
+  };
+
   proceedHandler = step => {
     const aliens = [...this.props.aliens];
 
@@ -810,7 +753,7 @@ class PlayerPhase extends Component {
       this.props.advancePhase();
     } else if (step === 'no homeworld invasion') {
       /* advance to elimination check or next phase */
-      const invaded = this.checkForInvaded(aliens);
+      const invaded = checkForInvaded(aliens);
 
       if (invaded) {
         this.props.advanceStep({ step: 'homeworld eliminations' });
@@ -820,12 +763,12 @@ class PlayerPhase extends Component {
     } else if (step === 'no fleet encounter') {
       this.props.advanceStep({ step: 'homeworld invasions' });
     } else {
-      const fleetsExist = this.checkForFleets();
+      const fleetsExist = checkForFleets(aliens);
 
       if (fleetsExist) {
         this.props.advanceStep({ step: 'fleet encounters' });
       } else {
-        const uninvaded = this.checkForUninvaded(aliens);
+        const uninvaded = checkForUninvaded(aliens);
 
         if (uninvaded) {
           this.props.advanceStep({ step: 'homeworld invasions' });
@@ -838,11 +781,12 @@ class PlayerPhase extends Component {
   };
 
   render() {
+    const aliens = [...this.props.aliens];
     let step = this.props.step;
     let stepComponents;
 
     if (step === 'check for fleets') {
-      let fleetsExist = this.checkForFleets();
+      let fleetsExist = checkForFleets(aliens);
       if (fleetsExist) {
         step = 'fleet encounters';
       } else {
@@ -854,7 +798,7 @@ class PlayerPhase extends Component {
       stepComponents = (
         <Aux>
           <FleetEncounter
-            aliens={this.props.aliens}
+            aliens={aliens}
             proceed={this.proceedHandler}
             fleetEncountered={this.fleetEncounteredHandler}
           />
@@ -876,10 +820,10 @@ class PlayerPhase extends Component {
         />
       );
     } else if (step === 'homeworld invasions') {
-      const aliens = this.props.aliens.filter(alien => alien.invaded === false);
+      const filteredAliens = aliens.filter(alien => alien.invaded === false);
       stepComponents = (
         <HomeworldInvasion
-          aliens={aliens}
+          aliens={filteredAliens}
           homeworldInvaded={this.homeworldInvadedHandler}
           proceed={this.proceedHandler}
         />
@@ -892,10 +836,10 @@ class PlayerPhase extends Component {
         />
       );
     } else if (step === 'homeworld eliminations') {
-      const aliens = this.props.aliens.filter(alien => alien.invaded === true);
+      const filteredAliens = aliens.filter(alien => alien.invaded === true);
       stepComponents = (
         <HomeworldElimination
-          aliens={aliens}
+          aliens={filteredAliens}
           homeworldEliminated={this.homeworldEliminatedHandler}
           proceed={this.proceedHandler}
         />
