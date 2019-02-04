@@ -4,8 +4,13 @@ import PropTypes from 'prop-types';
 import Aux from '../../hoc/Auxiliary';
 import Instructions from '../Instructions/Instructions';
 
+import classes from './FleetConstruction.module.scss';
+
 const fleetConstruction = props => (
   <Aux>
+    <p className={classes.fleetConstructor}>
+      <span className={props.color}>{props.color}</span> Fleet #{props.fleetId}:
+    </p>
     <Instructions instructions={props.instructions} />
     <button
       className="advance"

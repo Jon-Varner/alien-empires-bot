@@ -25,7 +25,6 @@
 <h2>Known issues and future plans</h2>
 
 <ol>
-  <li>Currently, the app only constructs 4 types of fleets: Raiders, Carriers, "Biggest Ships Possible", and "Most Ships Possible". The final type of fleet, "Balanced" is a more complicated algorithm, but I'll get it done soon.</li>
   <li>There is currently no way to save game state--if you refresh the page, you'll begin a new game. I may implement a database at some point, which would necessitate some form of user login or at least cookies.</li>
   <li>Eventually, I might add support for the Doomsday Machines scenario and the scenarios from the Close Encounters and Replicators expansions.</li>
 </ol>

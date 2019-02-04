@@ -270,6 +270,7 @@ export function constructFleet(
             break;
           default:
             /* This should be impossible to reach */
+            console.log('IMPOSSIBLE!');
             techSelected = true;
         }
       }
@@ -329,7 +330,7 @@ export function constructFleet(
       fleet.cp -= 9;
       fleet.destroyerBuilt = true;
       fleet.destroyers += 1;
-    } else {
+    } else if (fleet.cp > 5) {
       fleet.cp -= 6;
       fleet.scouts += 1;
     }
@@ -340,6 +341,7 @@ export function constructFleet(
     if (
       alien.scanners >= player.cloaking &&
       fleet.destroyerBuilt === false &&
+      alien.shipSize > 1 &&
       fleet.cp > 8
     ) {
       fleet.cp -= 9;
@@ -363,7 +365,6 @@ export function constructFleet(
 
     if (currentRoll < 4) {
       /* Build the largest fleet possible */
-
       while (fleet.cp > 9) {
         fleet.cp -= 6;
         fleet.scouts += 1;
@@ -376,23 +377,51 @@ export function constructFleet(
         fleet.cp -= 6;
         fleet.scouts += 1;
       }
+    } else if (currentRoll < 7 && alien.attack < 3 && alien.defense < 3) {
+      /* Build a "balanced" fleet. */
+      if (alien.attack > 1 || alien.defense > 1) {
+        /* Build the most cruisers but buy battlecruisers if affordable */
+        if (alien.shipSize > 3) {
+          while (fleet.cp > 14 && fleet.cp % 12 > 2) {
+            fleet.cp -= 15;
+            fleet.battlecruisers += 1;
+          }
+        }
 
-      /* TODO: Calculate a balanced fleet. This is a trickier algorithm 
-    
-          } else if (currentRoll < 7) {
-    
-            22. ELSE 
-                  IF (alien.attack > 2 || alien.defense > 2)
-                    GOTO 16
-                  ELSE IF (alien.attack > 1 || alien.defense > 1)
-                    GOTO 23
-                  ELSE 
-                    GOTO 24              
-            23. CALCULATE fleet composition for maximum cost effectiveness
-                NO DREADNAUGHTS OR BATTLESHIPS
-            24. CALCULATE fleet composition for maximum cost effectiveness
-                DESTROYERS AND SCOUTS ONLY
-            */
+        if (alien.shipSize > 2) {
+          while (fleet.cp > 11) {
+            fleet.cp -= 12;
+            fleet.cruisers += 1;
+          }
+        }
+
+        if (alien.shipSize > 1) {
+          while (fleet.cp > 8) {
+            fleet.cp -= 9;
+            fleet.destroyerBuilt = true;
+            fleet.destroyers += 1;
+          }
+        }
+
+        while (fleet.cp > 5) {
+          fleet.cp -= 6;
+          fleet.scouts += 1;
+        }
+      } else {
+        /* Build the most ships but buy destroyers if affordable */
+        if (alien.shipSize > 1) {
+          while (fleet.cp > 8 && fleet.cp % 6 > 2) {
+            fleet.cp -= 9;
+            fleet.destroyerBuilt = true;
+            fleet.destroyers += 1;
+          }
+        }
+
+        while (fleet.cp > 5) {
+          fleet.cp -= 6;
+          fleet.scouts += 1;
+        }
+      }
     } else {
       /* Build the largest ships possible */
       while (fleet.cp > 5) {

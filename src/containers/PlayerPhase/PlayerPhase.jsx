@@ -248,6 +248,8 @@ class PlayerPhase extends Component {
     } else if (step === 'fleet construction') {
       stepComponents = (
         <FleetConstruction
+          color={this.props.currentAlien.color}
+          fleetId={this.props.currentFleet.id}
           instructions={this.props.instructions}
           fleetConstructed={this.fleetConstructedHandler}
         />
