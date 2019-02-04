@@ -1,6 +1,6 @@
 <h1>Alien Empires Bot</h1>
 
-<p>This app handles all of the calculations for the alien empires in the <a href="https://www.gmtgames.com/p-533-space-empires-3rd-printing.aspx">Space Empires: 4x</a> solo scenario.</p>
+<p>This Web app handles all of the calculations for the alien empires in the <a href="https://www.gmtgames.com/p-533-space-empires-3rd-printing.aspx">Space Empires: 4x</a> solo scenario.</p>
 
 <p>It is optimized for mobile and can be found here: <a href="https://alien-empires-bot.herokuapp.com/">https://alien-empires-bot.herokuapp.com/</a>
 
