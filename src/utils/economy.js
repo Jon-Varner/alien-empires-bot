@@ -171,18 +171,15 @@ export function calculateAlienEconomy(turn, player, aliens, cp) {
 
       /* Find the target roll based on the current turn # */
       switch (turn) {
-        case 2:
-        case 3:
-        case 14:
-        case 16:
-        case 18:
-        case 20:
-          fleetLaunchTarget = 10;
-          break;
         case 4:
         case 9:
         case 10:
           fleetLaunchTarget = 5;
+          break;
+        case 6:
+        case 7:
+        case 8:
+          fleetLaunchTarget = 4;
           break;
         case 5:
         case 11:
@@ -193,13 +190,9 @@ export function calculateAlienEconomy(turn, player, aliens, cp) {
         case 19:
           fleetLaunchTarget = 3;
           break;
-        case 6:
-        case 7:
-        case 8:
-          fleetLaunchTarget = 4;
-          break;
         default:
-          fleetLaunchTarget = 0;
+          fleetLaunchTarget = 10;
+          break;
       }
 
       /* Subtract roll modifier */
