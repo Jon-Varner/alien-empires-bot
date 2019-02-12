@@ -11,9 +11,7 @@ export function calculateAlienEconomy(turn, player, aliens, cp) {
   let currentRoll = 0;
 
   /* For each alien: */
-  for (let i = 0; i < aliens.length; i++) {
-    const alien = aliens[i];
-
+  for (const alien of aliens) {
     /* Reset invasions */
     alien.invaded = false;
 
@@ -170,29 +168,17 @@ export function calculateAlienEconomy(turn, player, aliens, cp) {
       }
 
       /* Find the target roll based on the current turn # */
-      switch (turn) {
-        case 4:
-        case 9:
-        case 10:
-          fleetLaunchTarget = 5;
-          break;
-        case 6:
-        case 7:
-        case 8:
-          fleetLaunchTarget = 4;
-          break;
-        case 5:
-        case 11:
-        case 12:
-        case 13:
-        case 15:
-        case 17:
-        case 19:
-          fleetLaunchTarget = 3;
-          break;
-        default:
-          fleetLaunchTarget = 10;
-          break;
+      /* Past Turn 12, alternate between 3 and 10 */
+      if (turn === 4 || turn === 9 || turn === 10) {
+        fleetLaunchTarget = 5;
+      } else if (turn > 5 && turn < 9) {
+        fleetLaunchTarget = 4;
+      } else if (turn === 5 || turn === 11 || turn === 12) {
+        fleetLaunchTarget = 3;
+      } else if (turn === 3 || turn % 2 === 0) {
+        fleetLaunchTarget = 10;
+      } else {
+        fleetLaunchTarget = 3;
       }
 
       /* Subtract roll modifier */

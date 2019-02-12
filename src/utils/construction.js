@@ -165,7 +165,6 @@ export function constructFleet(
           case 3:
           case 4:
             /* upgrade defense */
-
             if (alien.defense < 3) {
               let defenseCost = 20;
 
@@ -184,7 +183,6 @@ export function constructFleet(
             break;
           case 5:
             /* upgrade attack to 2, then defense to 2, then tactics */
-
             if (alien.attack < 2) {
               let attackCost = 20;
 
@@ -217,7 +215,6 @@ export function constructFleet(
             break;
           case 6:
             /* upgrade cloaking */
-
             if (
               alien.cloaking < 2 &&
               player.scanners < 2 &&
@@ -230,7 +227,6 @@ export function constructFleet(
             break;
           case 7:
             /* upgrade scanners */
-
             if (alien.scanners < 2 && alien.techcp > 19) {
               alien.scanners += 1;
               alien.techcp -= 20;
@@ -239,7 +235,6 @@ export function constructFleet(
             break;
           case 8:
             /* upgrade fighters */
-
             if (alien.fighters < 3 && alien.techcp > 24) {
               alien.fighters += 1;
               alien.techcp -= 25;
@@ -248,7 +243,6 @@ export function constructFleet(
             break;
           case 9:
             /* upgrade point defense */
-
             if (alien.pointDefense < 3 && alien.techcp > 19) {
               alien.pointDefense += 1;
               alien.techcp -= 20;
@@ -257,7 +251,6 @@ export function constructFleet(
             break;
           case 10:
             /* upgrade minesweeper */
-
             if (alien.minesweeper === 0 && alien.techcp > 9) {
               alien.minesweeper += 1;
               alien.techcp -= 10;
@@ -270,7 +263,6 @@ export function constructFleet(
             break;
           default:
             /* This should be impossible to reach */
-            console.log('IMPOSSIBLE!');
             techSelected = true;
         }
       }
@@ -278,7 +270,6 @@ export function constructFleet(
   }
 
   /* First attempt to build a fleet of carriers and fighters */
-
   currentRoll = rollDie();
 
   while (
@@ -293,7 +284,6 @@ export function constructFleet(
   }
 
   /* Next attempt to build a fleet of raiders */
-
   if (
     defensive === false &&
     fleet.carrier === false &&
@@ -459,12 +449,11 @@ export function constructFleet(
   fleets.splice(index, 1, fleet);
   alien.fleets = fleets;
 
-  /* Update this alien's technologies */
   /* Update the alien in the aliens array and push it to Redux */
   index = aliens.findIndex(item => item.id === alien.id);
   aliens.splice(index, 1, alien);
 
-  /* show the fleet construction instructions */
+  /* Collate the fleet construction instructions */
   if (fleet.raiders > 0) {
     instructions.push(
       <li>
