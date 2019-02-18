@@ -17,7 +17,7 @@ class FleetEncounter extends Component {
       const fleets = [...alien.fleets];
 
       fleets.forEach(fleet => {
-        if (fleet.encountered === false) {
+        if (!fleet.encountered) {
           allFleets.push({
             color: alien.color,
             alienId: alien.id,
