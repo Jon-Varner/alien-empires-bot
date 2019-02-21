@@ -571,7 +571,7 @@ export function constructDefenses(currentAliens, alienId) {
     }
   } else if (currentRoll > 7) {
     /* Buy as many bases as possible, then mines */
-    while (alien.defensecp > 11) {
+    while (alien.bases < 3 && alien.defensecp > 11) {
       alien.bases += 1;
       alien.defensecp -= 12;
     }
@@ -582,17 +582,17 @@ export function constructDefenses(currentAliens, alienId) {
     }
   } else {
     /* Alternate bases and mines, then get mines until broke */
-    let purchased = '';
+    let purchased = 'base';
 
     while (alien.defensecp > 11) {
-      if (purchased === 'base') {
-        alien.mines += 1;
-        alien.defensecp -= 5;
-        purchased = 'mine';
-      } else {
+      if (purchased === 'mine' && alien.bases < 3) {
         alien.bases += 1;
         alien.defensecp -= 12;
         purchased = 'base';
+      } else {
+        alien.mines += 1;
+        alien.defensecp -= 5;
+        purchased = 'mine';
       }
     }
 
