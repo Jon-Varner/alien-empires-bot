@@ -1,4 +1,4 @@
-import * as actionTypes from '../actions';
+import { UPDATE_PLAYER_TECH } from '../actions/types';
 
 const initialState = {
   player: {
@@ -12,7 +12,7 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.UPDATE_PLAYER_TECH:
+    case UPDATE_PLAYER_TECH:
       return {
         ...state,
         player: action.payload.player

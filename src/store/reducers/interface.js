@@ -1,4 +1,4 @@
-import * as actionTypes from '../actions';
+import { TOGGLE_DRAWER } from '../actions/types';
 
 const initialState = {
   footerClass: ''
@@ -6,7 +6,7 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.TOGGLE_DRAWER:
+    case TOGGLE_DRAWER:
       let footerClass = state.footerClass;
 
       if (footerClass === '') {

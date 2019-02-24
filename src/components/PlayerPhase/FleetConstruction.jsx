@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Aux from '../../hoc/Auxiliary';
-import Instructions from '../Instructions/Instructions';
+import Instructions from '../Messages/Instructions';
 
 import classes from './FleetConstruction.module.scss';
 

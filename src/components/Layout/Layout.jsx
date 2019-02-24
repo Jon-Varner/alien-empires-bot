@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary';
-import Header from '../../components/Header/Header';
-import GameSettings from '../../containers/GameSettings/GameSettings';
-import AlienTechList from '../../components/AlienTechList/AlienTechList';
-import Turn from '../../components/Turn/Turn';
+import Header from './Header';
+import GameSettings from '../../components/GameSettings/GameSettings';
+import AlienTechList from './AlienTechList';
+import Turn from '../Layout/Turn';
 
-import * as actionTypes from '../../store/actions';
+import * as actionTypes from '../../store/actions/types';
 
 class Layout extends Component {
   displayHeadline = () => {

@@ -1,4 +1,4 @@
-import * as actionTypes from '../actions';
+import { START_GAME, ADVANCE_PHASE, ADVANCE_STEP } from '../actions/types';
 
 const initialState = {
   turn: 0,
@@ -8,12 +8,12 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.START_GAME:
+    case START_GAME:
       return {
         ...state,
         turn: 1
       };
-    case actionTypes.ADVANCE_PHASE:
+    case ADVANCE_PHASE:
       let phase = '';
       let turn = state.turn;
 
@@ -28,7 +28,7 @@ const reducer = (state = initialState, action) => {
         turn: turn,
         phase: phase
       };
-    case actionTypes.ADVANCE_STEP:
+    case ADVANCE_STEP:
       return {
         ...state,
         step: action.payload.step

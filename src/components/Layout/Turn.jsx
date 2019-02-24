@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import PlayerPhase from '../../containers/PlayerPhase/PlayerPhase';
-import AlienPhase from '../../containers/AlienPhase/AlienPhase';
+import PlayerPhase from '../PlayerPhase/PlayerPhase';
+import AlienPhase from '../AlienPhase/AlienPhase';
 
 const turn = props => {
   if (props.phase === 'alien') {

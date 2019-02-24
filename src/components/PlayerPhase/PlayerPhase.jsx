@@ -9,16 +9,16 @@ import {
 import { constructFleet, constructDefenses } from '../../utils/construction';
 
 import Aux from '../../hoc/Auxiliary';
-import Instructions from '../../components/Instructions/Instructions';
-import FleetEncounter from '../../components/FleetEncounter/FleetEncounter';
-import PlayerTechReveal from '../../components/PlayerTechReveal/PlayerTechReveal';
-import FleetConstruction from '../../components/FleetConstruction/FleetConstruction';
-import HomeworldInvasion from '../../components/HomeworldInvasion/HomeworldInvasion';
-import HomeworldElimination from '../../components/HomeworldElimination/HomeworldElimination';
-import HomeworldDefenseConstruction from '../../components/HomeworldDefenseConstruction/HomeworldDefenseConstruction';
-import GameOver from '../../components/GameOver/GameOver';
+import Instructions from '../../components/Messages/Instructions';
+import FleetEncounter from '../../components/PlayerPhase/FleetEncounter';
+import PlayerTechReveal from '../../components/PlayerPhase/PlayerTechReveal';
+import FleetConstruction from '../../components/PlayerPhase/FleetConstruction';
+import HomeworldInvasion from '../../components/PlayerPhase/HomeworldInvasion';
+import HomeworldElimination from '../../components/PlayerPhase/HomeworldElimination';
+import HomeworldDefenseConstruction from '../../components/PlayerPhase/HomeworldDefenseConstruction';
+import GameOver from '../../components/Messages/GameOver';
 
-import * as actionTypes from '../../store/actions';
+import * as actionTypes from '../../store/actions/types';
 
 class PlayerPhase extends Component {
   fleetEncounteredHandler = (alienId, fleetId) => {

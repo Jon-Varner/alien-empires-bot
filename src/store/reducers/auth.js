@@ -1,15 +1,16 @@
-import { SET_INSTRUCTIONS } from '../actions/types';
+import { TEST_DISPATCH } from '../actions/types';
 
 const initialState = {
-  instructions: []
+  isAuthenticated: false,
+  user: {}
 };
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_INSTRUCTIONS:
+    case TEST_DISPATCH:
       return {
         ...state,
-        instructions: action.payload.instructions
+        user: action.payload.user
       };
     default:
       return state;

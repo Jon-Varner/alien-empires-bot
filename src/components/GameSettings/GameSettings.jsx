@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import uuid from 'uuid';
 
-import * as actionTypes from '../../store/actions';
+import * as actionTypes from '../../store/actions/types';
 
 import classes from './GameSettings.module.scss';
 

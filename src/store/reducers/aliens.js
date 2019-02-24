@@ -1,4 +1,8 @@
-import * as actionTypes from '../actions';
+import {
+  SET_DIFFICULTY,
+  SET_CURRENT_ALIEN_AND_FLEET,
+  UPDATE_ALIENS
+} from '../actions/types';
 
 const initialState = {
   cpPerTurn: 5,
@@ -56,24 +60,19 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.SET_DIFFICULTY:
+    case SET_DIFFICULTY:
       return {
         ...state,
         cpPerTurn: action.payload.cpPerTurn,
         aliens: action.payload.aliens
       };
-    case actionTypes.SET_CURRENT_ALIEN_AND_FLEET:
+    case SET_CURRENT_ALIEN_AND_FLEET:
       return {
         ...state,
         currentAlien: action.payload.alien,
         currentFleet: action.payload.fleet
       };
-    case actionTypes.UPDATE_ALIEN:
-      return {
-        ...state,
-        aliens: action.payload.aliens
-      };
-    case actionTypes.UPDATE_ALIENS:
+    case UPDATE_ALIENS:
       return {
         ...state,
         aliens: action.payload.aliens

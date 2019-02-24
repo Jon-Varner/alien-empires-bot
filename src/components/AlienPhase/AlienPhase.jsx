@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 
 import { calculateAlienEconomy } from '../../utils/economy';
 import Aux from '../../hoc/Auxiliary';
-import Instructions from '../../components/Instructions/Instructions';
+import Instructions from '../../components/Messages/Instructions';
 
-import * as actionTypes from '../../store/actions';
+import * as actionTypes from '../../store/actions/types';
 
 class AlienPhase extends Component {
   componentDidMount() {
