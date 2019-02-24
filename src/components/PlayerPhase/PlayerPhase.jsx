@@ -21,7 +21,7 @@ import GameOver from '../../components/Messages/GameOver';
 import * as actionTypes from '../../store/actions/types';
 
 class PlayerPhase extends Component {
-  fleetEncounteredHandler = (alienId, fleetId) => {
+  onFleetEncountered = (alienId, fleetId) => {
     /* show screen with select boxes for all player techs */
 
     const aliens = [...this.props.aliens];
@@ -39,7 +39,7 @@ class PlayerPhase extends Component {
     });
   };
 
-  playerTechUpdatedHandler = (id, value) => {
+  onPlayerTechUpdated = (id, value) => {
     const player = { ...this.props.player };
 
     switch (id) {
@@ -67,7 +67,7 @@ class PlayerPhase extends Component {
     });
   };
 
-  constructFleetHandler = () => {
+  onConstructFleet = () => {
     const constructed = constructFleet(
       'offensive',
       [...this.props.aliens],
@@ -79,7 +79,7 @@ class PlayerPhase extends Component {
     this.props.updateAliensAndSetInstructions(constructed);
   };
 
-  fleetConstructedHandler = () => {
+  onFleetConstructed = () => {
     const aliens = [...this.props.aliens];
     let step = '';
 
@@ -106,7 +106,7 @@ class PlayerPhase extends Component {
     }
   };
 
-  homeworldInvadedHandler = alienId => {
+  onHomeworldInvaded = alienId => {
     const aliens = [...this.props.aliens];
 
     const defenses = constructDefenses(aliens, alienId);
@@ -124,7 +124,7 @@ class PlayerPhase extends Component {
     this.props.updateAliensAndSetInstructions(construction);
   };
 
-  homeworldDefenseConstructedHandler = () => {
+  onHomeworldDefenseConstructed = () => {
     const invaded = checkForInvaded(this.props.aliens);
     let step = 'homeworld invasions';
 
@@ -139,7 +139,7 @@ class PlayerPhase extends Component {
     });
   };
 
-  homeworldEliminatedHandler = alienId => {
+  onHomeworldEliminated = alienId => {
     const aliens = [...this.props.aliens];
 
     const index = aliens.findIndex(item => item.id === alienId);
@@ -178,7 +178,7 @@ class PlayerPhase extends Component {
     }
   };
 
-  proceedHandler = step => {
+  onProceed = step => {
     const aliens = [...this.props.aliens];
 
     if (step === 'no homeworld elimination') {
@@ -232,8 +232,8 @@ class PlayerPhase extends Component {
         <Aux>
           <FleetEncounter
             aliens={aliens}
-            proceed={this.proceedHandler}
-            fleetEncountered={this.fleetEncounteredHandler}
+            proceed={this.onProceed}
+            fleetEncountered={this.onFleetEncountered}
           />
         </Aux>
       );
@@ -241,8 +241,8 @@ class PlayerPhase extends Component {
       stepComponents = (
         <PlayerTechReveal
           player={this.props.player}
-          playerTechUpdated={this.playerTechUpdatedHandler}
-          proceed={this.constructFleetHandler}
+          playerTechUpdated={this.onPlayerTechUpdated}
+          proceed={this.onConstructFleet}
         />
       );
     } else if (step === 'fleet construction') {
@@ -251,7 +251,7 @@ class PlayerPhase extends Component {
           color={this.props.currentAlien.color}
           fleetId={this.props.currentFleet.id}
           instructions={this.props.instructions}
-          fleetConstructed={this.fleetConstructedHandler}
+          fleetConstructed={this.onFleetConstructed}
         />
       );
     } else if (step === 'homeworld invasions') {
@@ -259,15 +259,15 @@ class PlayerPhase extends Component {
       stepComponents = (
         <HomeworldInvasion
           aliens={filteredAliens}
-          homeworldInvaded={this.homeworldInvadedHandler}
-          proceed={this.proceedHandler}
+          homeworldInvaded={this.onHomeworldInvaded}
+          proceed={this.onProceed}
         />
       );
     } else if (step === 'homeworld defense construction') {
       stepComponents = (
         <HomeworldDefenseConstruction
           instructions={this.props.instructions}
-          homeworldDefenseConstructed={this.homeworldDefenseConstructedHandler}
+          homeworldDefenseConstructed={this.onHomeworldDefenseConstructed}
         />
       );
     } else if (step === 'homeworld eliminations') {
@@ -275,8 +275,8 @@ class PlayerPhase extends Component {
       stepComponents = (
         <HomeworldElimination
           aliens={filteredAliens}
-          homeworldEliminated={this.homeworldEliminatedHandler}
-          proceed={this.proceedHandler}
+          homeworldEliminated={this.onHomeworldEliminated}
+          proceed={this.onProceed}
         />
       );
     } else if (step === 'game over') {
@@ -285,7 +285,7 @@ class PlayerPhase extends Component {
       stepComponents = (
         <Instructions
           instructions={this.props.instructions}
-          proceedHandler={this.proceedHandler}
+          onProceed={this.onProceed}
         />
       );
     }

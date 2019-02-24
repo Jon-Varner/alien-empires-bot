@@ -78,7 +78,7 @@ class GameSettings extends Component {
     }
   };
 
-  colorChangeHandler = event => {
+  onColorChange = event => {
     /* Ensure each alien has a unique color */
     const thisColor = event.target.value;
     const thisId = parseInt(event.target.id);
@@ -98,7 +98,7 @@ class GameSettings extends Component {
     }
   };
 
-  difficultyChangeHandler = event => {
+  onDifficultyChange = event => {
     let difficulty = event.target.value;
 
     /* Set number of aliens and set CP per turn */
@@ -111,7 +111,7 @@ class GameSettings extends Component {
     });
   };
 
-  startHandler = () => {
+  onStart = () => {
     /* Add all the extra empty properties */
 
     this.props.startGame();
@@ -126,7 +126,7 @@ class GameSettings extends Component {
         <select
           id="difficultySelector"
           className={classes.difficultySelector}
-          onChange={this.difficultyChangeHandler}
+          onChange={this.onDifficultyChange}
         >
           <option value="easy">Easy</option>
           <option value="normal">Normal</option>
@@ -145,7 +145,7 @@ class GameSettings extends Component {
                   id={alien.id}
                   value={alien.color}
                   className={classes.colorSelector}
-                  onChange={this.colorChangeHandler}
+                  onChange={this.onColorChange}
                 >
                   <option value="red">Red</option>
                   <option value="blue">Blue</option>
@@ -156,7 +156,7 @@ class GameSettings extends Component {
             );
           })}
         </ul>
-        <button className="advance" onClick={this.startHandler}>
+        <button className="advance" onClick={this.onStart}>
           PLAY
         </button>
       </div>

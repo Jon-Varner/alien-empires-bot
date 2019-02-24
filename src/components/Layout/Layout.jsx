@@ -23,7 +23,7 @@ class Layout extends Component {
     return headline;
   };
 
-  toggleDrawerHandler = () => {
+  onToggleDrawer = () => {
     this.props.toggleDrawer();
   };
 
@@ -37,7 +37,7 @@ class Layout extends Component {
         <AlienTechList
           aliens={this.props.aliens}
           footerClass={this.props.footerClass}
-          toggled={this.toggleDrawerHandler}
+          toggled={this.onToggleDrawer}
         />
       );
     } else {

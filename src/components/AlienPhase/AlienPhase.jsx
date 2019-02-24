@@ -23,7 +23,7 @@ class AlienPhase extends Component {
     });
   }
 
-  advanceHandler = () => {
+  onAdvance = () => {
     const fleetLaunched = this.props.fleetLaunched;
     let step = this.props.step;
 
@@ -42,7 +42,7 @@ class AlienPhase extends Component {
     return (
       <Aux>
         <Instructions instructions={instructions} />
-        <button className="advance" onClick={this.advanceHandler}>
+        <button className="advance" onClick={this.onAdvance}>
           END TURN
         </button>
       </Aux>
