@@ -32,6 +32,8 @@ class GameSettings extends Component {
         tactics: 0,
         mines: 0,
         bases: 0,
+        invaded: false,
+        defended: false,
         fleets: []
       });
     }

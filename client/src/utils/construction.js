@@ -557,7 +557,7 @@ export const constructDefenses = (currentAliens, alienId) => {
   /* Look up this alien ID and get its defensecp */
   const alien = aliens.find(alien => alien.id === alienId);
 
-  alien.invaded = true;
+  alien.defended = true;
 
   /* Only report new mines and bases to be added */
   alien.mines = 0;

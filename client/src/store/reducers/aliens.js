@@ -28,6 +28,7 @@ const initialState = {
       mines: 0,
       bases: 0,
       invaded: false,
+      defended: false,
       fleets: []
     },
     {
@@ -51,6 +52,7 @@ const initialState = {
       mines: 0,
       bases: 0,
       invaded: false,
+      defended: false,
       fleets: []
     }
   ],

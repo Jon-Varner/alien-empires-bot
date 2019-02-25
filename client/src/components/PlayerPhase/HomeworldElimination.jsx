@@ -6,7 +6,7 @@ import Aux from '../../hoc/Auxiliary';
 
 const homeworldElimination = props => (
   <Aux>
-    <p>Did you destroy an alien homeworld?</p>
+    <p>Did you destroy any homeworld?</p>
     <ul>
       {props.aliens.map(alien => (
         <li key={uuid.v4()}>
@@ -20,7 +20,6 @@ const homeworldElimination = props => (
           </button>
         </li>
       ))}
-
       <li>
         <button
           className="advance"

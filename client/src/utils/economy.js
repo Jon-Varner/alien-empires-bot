@@ -17,6 +17,7 @@ export const calculateAlienEconomy = (turn, player, aliens, cp) => {
   for (const alien of aliens) {
     /* Reset invasions */
     alien.invaded = false;
+    alien.defended = false;
 
     /* Always add an econ roll on these turns */
     const addedRolls = [3, 6, 10, 15];

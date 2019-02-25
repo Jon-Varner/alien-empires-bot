@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import {
-  checkForFleets,
-  checkForInvaded,
-  checkForUninvaded
-} from '../../utils/status';
+import { checkForFleets } from '../../utils/status';
 import { constructFleet, constructDefenses } from '../../utils/construction';
 
 import Aux from '../../hoc/Auxiliary';
@@ -89,9 +85,11 @@ class PlayerPhase extends Component {
     if (fleetsExist) {
       step = 'fleet encounters';
     } else {
-      let uninvaded = checkForUninvaded(aliens);
+      const undefended = aliens.filter(
+        alien => !alien.invaded && !alien.defended
+      );
 
-      if (uninvaded) {
+      if (undefended.length > 0) {
         step = 'homeworld invasions';
       }
     }
@@ -125,11 +123,16 @@ class PlayerPhase extends Component {
   };
 
   onHomeworldDefenseConstructed = () => {
-    const invaded = checkForInvaded(this.props.aliens);
-    let step = 'homeworld invasions';
+    const aliens = [...this.props.aliens];
 
-    if (invaded) {
-      step = 'homeworld eliminations';
+    const undefended = aliens.filter(
+      alien => !alien.invaded && !alien.defended
+    );
+
+    let step = 'homeworld eliminations';
+
+    if (undefended.length > 0) {
+      step = 'homeworld invasions';
     }
 
     /* return to encounter phase */
@@ -159,9 +162,9 @@ class PlayerPhase extends Component {
         instructions: []
       });
     } else {
-      const invaded = checkForInvaded(aliens);
+      const defended = aliens.filter(alien => alien.defended);
 
-      if (invaded) {
+      if (defended.length > 0) {
         this.props.updateAliensAndSetInstructions({
           aliens: aliens,
           alien: this.props.currentAlien,
@@ -186,9 +189,8 @@ class PlayerPhase extends Component {
       this.props.advancePhase();
     } else if (step === 'no homeworld invasion') {
       /* advance to elimination check or next phase */
-      const invaded = checkForInvaded(aliens);
-
-      if (invaded) {
+      const defended = aliens.filter(alien => alien.defended);
+      if (defended.length > 0) {
         this.props.advanceStep({ step: 'homeworld eliminations' });
       } else {
         this.props.advancePhase();
@@ -201,9 +203,10 @@ class PlayerPhase extends Component {
       if (fleetsExist) {
         this.props.advanceStep({ step: 'fleet encounters' });
       } else {
-        const uninvaded = checkForUninvaded(aliens);
-
-        if (uninvaded) {
+        const uninvaded = aliens.filter(
+          alien => !alien.invaded && !alien.defended
+        );
+        if (uninvaded.length > 0) {
           this.props.advanceStep({ step: 'homeworld invasions' });
         } else {
           /* advance to next econ phase */
@@ -255,7 +258,9 @@ class PlayerPhase extends Component {
         />
       );
     } else if (step === 'homeworld invasions') {
-      const filteredAliens = aliens.filter(alien => alien.invaded === false);
+      const filteredAliens = aliens.filter(
+        alien => !alien.invaded && !alien.defended
+      );
       stepComponents = (
         <HomeworldInvasion
           aliens={filteredAliens}
@@ -271,10 +276,10 @@ class PlayerPhase extends Component {
         />
       );
     } else if (step === 'homeworld eliminations') {
-      const filteredAliens = aliens.filter(alien => alien.invaded === true);
+      const defended = aliens.filter(alien => alien.defended);
       stepComponents = (
         <HomeworldElimination
-          aliens={filteredAliens}
+          aliens={defended}
           homeworldEliminated={this.onHomeworldEliminated}
           proceed={this.onProceed}
         />
