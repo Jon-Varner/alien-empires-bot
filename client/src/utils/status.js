@@ -1,4 +1,4 @@
-export function checkForFleets(aliens) {
+export const checkForFleets = aliens => {
   const allFleets = [];
 
   aliens.forEach(alien => {
@@ -20,9 +20,9 @@ export function checkForFleets(aliens) {
   }
 
   return false;
-}
+};
 
-export function checkForInvaded(aliens) {
+export const checkForInvaded = aliens => {
   let invaded = false;
 
   aliens.forEach(alien => {
@@ -32,9 +32,9 @@ export function checkForInvaded(aliens) {
   });
 
   return invaded;
-}
+};
 
-export function checkForUninvaded(aliens) {
+export const checkForUninvaded = aliens => {
   let uninvaded = false;
 
   aliens.forEach(alien => {
@@ -44,4 +44,4 @@ export function checkForUninvaded(aliens) {
   });
 
   return uninvaded;
-}
+};

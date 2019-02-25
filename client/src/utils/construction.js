@@ -1,14 +1,17 @@
 import React from 'react';
 import { rollDie, pluralize } from './utils';
 
-export function constructFleet(
+/* These giant functions are clearly ripe for refactoring. 
+   They're long and imperative because they are direct applications 
+   of instructions written out in a printed rule book. */
+export const constructFleet = (
   fleetType,
   currentAliens,
   currentAlien,
   currentPlayer,
   currentFleet,
   defenseInstructions
-) {
+) => {
   const aliens = currentAliens;
   const alien = currentAlien;
   const player = currentPlayer;
@@ -544,9 +547,9 @@ export function constructFleet(
     step: step,
     instructions: instructions
   };
-}
+};
 
-export function constructDefenses(currentAliens, alienId) {
+export const constructDefenses = (currentAliens, alienId) => {
   const aliens = currentAliens;
   const instructions = [];
   let currentRoll = 0;
@@ -613,4 +616,4 @@ export function constructDefenses(currentAliens, alienId) {
     alien: alien,
     instructions: instructions
   };
-}
+};

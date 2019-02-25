@@ -1,7 +1,10 @@
 import React from 'react';
 import { rollDie } from './utils';
 
-export function calculateAlienEconomy(turn, player, aliens, cp) {
+/* This giant functions are clearly ripe for refactoring. 
+   It's long and imperative because it's a direct application 
+   of instructions written out in a printed rule book. */
+export const calculateAlienEconomy = (turn, player, aliens, cp) => {
   let instructions = [];
   let step = '';
   let fleetLaunchTarget = 0;
@@ -295,4 +298,4 @@ export function calculateAlienEconomy(turn, player, aliens, cp) {
     aliens: aliens,
     step: step
   };
-}
+};
