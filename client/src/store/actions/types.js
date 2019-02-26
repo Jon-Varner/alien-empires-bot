@@ -6,5 +6,5 @@ export const UPDATE_ALIENS = 'UPDATE_ALIENS';
 export const UPDATE_PLAYER_TECH = 'UPDATE_PLAYER_TECH';
 export const ADVANCE_PHASE = 'ADVANCE_PHASE';
 export const ADVANCE_STEP = 'ADVANCE_STEP';
-export const TOGGLE_DRAWER = 'TOGGLE_DRAWER';
+export const TOGGLE = 'TOGGLE';
 export const TEST_DISPATCH = 'TEST_DISPATCH';

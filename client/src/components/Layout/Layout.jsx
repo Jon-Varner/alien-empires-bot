@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary';
 import Header from './Header';
+import Nav from './Nav';
+import UserMenu from './UserMenu';
 import GameSettings from '../../components/GameSettings/GameSettings';
 import AlienTechList from './AlienTechList';
 import Turn from '../Layout/Turn';
@@ -23,8 +25,12 @@ class Layout extends Component {
     return headline;
   };
 
-  onToggleDrawer = () => {
-    this.props.toggleDrawer();
+  onToggleUserMenu = () => {
+    this.props.toggle('user menu');
+  };
+
+  onToggleFooter = () => {
+    this.props.toggle('footer');
   };
 
   render() {
@@ -37,7 +43,7 @@ class Layout extends Component {
         <AlienTechList
           aliens={this.props.aliens}
           footerClass={this.props.footerClass}
-          toggled={this.onToggleDrawer}
+          toggled={this.onToggleFooter}
         />
       );
     } else {
@@ -47,6 +53,8 @@ class Layout extends Component {
     return (
       <Aux>
         <Header headline={this.displayHeadline()} />
+        <Nav toggled={this.onToggleUserMenu} />
+        <UserMenu menuClass={this.props.menuClass} />
         <main>{current}</main>
         {footer}
       </Aux>
@@ -59,14 +67,20 @@ const mapStateToProps = state => {
     turn: state.turn.turn,
     phase: state.turn.phase,
     aliens: state.aliens.aliens,
+    menuClass: state.interface.menuClass,
     footerClass: state.interface.footerClass
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    toggleDrawer: () => {
-      dispatch({ type: actionTypes.TOGGLE_DRAWER });
+    toggle: target => {
+      dispatch({
+        type: actionTypes.TOGGLE,
+        payload: {
+          target: target
+        }
+      });
     }
   };
 };
