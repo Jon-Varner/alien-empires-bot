@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -6,15 +6,22 @@ import Aux from '../../hoc/Auxiliary';
 
 class Register extends Component {
   state = {
-    name: '',
+    username: '',
     email: '',
     password: '',
     passwordConfirm: '',
-    errors: {}
+    errors: []
   };
 
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
+  };
+
+  onSubmit = event => {
+    event.preventDefault();
+
+    const newUser = {};
+    console.log();
   };
 
   render() {
@@ -25,12 +32,13 @@ class Register extends Component {
           Email is not required, but if you don't enter one, you won't be able
           to recover a lost password.
         </p>
-        <form>
+        <ul className="errors">[this.state.errors]</ul>
+        <form onSubmit={this.onSubmit}>
           <input
             type="text"
-            name="name"
-            placeholder="Name"
-            value={this.state.name}
+            name="username"
+            placeholder="Username"
+            value={this.state.username}
             onChange={this.onChange}
             required
           />
@@ -64,11 +72,13 @@ class Register extends Component {
   }
 }
 
+/*
 Register.propTypes = {
   registerUser: PropTypes.func.isRequired,
   registerFormUpdated: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired
 };
+*/
 
 const mapStateToProps = state => ({
   auth: state.auth
@@ -77,4 +87,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   null
-)(register);
+)(Register);

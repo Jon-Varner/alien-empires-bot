@@ -4,20 +4,12 @@ export const checkForFleets = aliens => {
   aliens.forEach(alien => {
     const fleets = [...alien.fleets];
 
-    fleets.forEach(fleet => {
-      if (fleet.encountered === false) {
-        allFleets.push({
-          color: alien.color,
-          alienId: alien.id,
-          fleetId: fleet.id
-        });
-      }
-    });
+    allFleets.push(...fleets);
   });
 
-  if (allFleets.length > 0) {
-    return true;
-  }
+  const unencountered = allFleets.some(fleet => fleet.encountered === false);
+
+  if (unencountered) return true;
 
   return false;
 };

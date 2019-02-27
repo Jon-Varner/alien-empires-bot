@@ -199,7 +199,6 @@ class PlayerPhase extends Component {
       this.props.advanceStep({ step: 'homeworld invasions' });
     } else {
       const fleetsExist = checkForFleets(aliens);
-
       if (fleetsExist) {
         this.props.advanceStep({ step: 'fleet encounters' });
       } else {
