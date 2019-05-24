@@ -4,14 +4,15 @@
   "private": true,
   "dependencies": {
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "node-sass": "^4.11.0",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
-    "react-redux": "^6.0.0",
-    "react-scripts": "2.1.5",
+    "node-sass": "^4.12.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-redux": "^7.0.2",
+    "react-scripts": "3.0.1",
     "redux": "^4.0.1",
+    "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
-    "serve": "^10.1.2",
+    "serve": "^11.0.0",
     "uuid": "^3.3.2"
   },
   "scripts": {
@@ -31,9 +32,8 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "1.15.3",
-    "redux-devtools": "^3.5.0",
-    "redux-devtools-extension": "^2.13.7"
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "1.17.1",
+    "redux-devtools": "^3.5.0"
   }
 }

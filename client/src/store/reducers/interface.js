@@ -11,8 +11,6 @@ const reducer = (state = initialState, action) => {
       const target = action.payload.target;
       let targetClass = '';
 
-      console.log(target + ' clicked');
-
       if (target === 'footer') {
         targetClass = state.footerClass;
         if (targetClass === '') {

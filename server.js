@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const passport = require('passport');
 const path = require('path');
 
@@ -10,8 +9,7 @@ const games = require('./routes/api/games');
 const app = express();
 
 /* Message parsing middleware */
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.json({ extended: false }));
 
 /* Connect to the database */
 const db = require('./config/keys').mongoURI;
