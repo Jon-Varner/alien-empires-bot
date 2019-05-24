@@ -11,6 +11,8 @@
     "react-scripts": "2.1.5",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
+    "redux-devtools": "^3.5.0",
+    "redux-devtools-extension": "^2.13.7",
     "serve": "^10.1.2",
     "uuid": "^3.3.2"
   },
@@ -31,8 +33,6 @@
   ],
   "devDependencies": {
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "1.15.3",
-    "redux-devtools": "^3.5.0",
-    "redux-devtools-extension": "^2.13.7"
+    "prettier": "1.15.3"
   }
 }
