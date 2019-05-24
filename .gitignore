@@ -1,3 +1,18 @@
-node_modules
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 package-lock.json
-/config/keys_dev.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

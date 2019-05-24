@@ -1,41 +1,39 @@
 {
-  "name": "alien-empires-bot",
-  "version": "1.0.0",
-  "description": "full-stack version of Space Empires: 4x alien empires management app",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "server": "nodemon server.js",
-    "client-install": "npm install --prefix client",
-    "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build"
-  },
-  "engines": {
-    "node": "8.11.4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Jon-Varner/alien-empires-bot.git"
-  },
-  "author": "Jon Varner",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Jon-Varner/alien-empires-bot/issues"
-  },
-  "homepage": "https://github.com/Jon-Varner/alien-empires-bot#readme",
+  "name": "alien-empire-bots",
+  "version": "0.1.0",
+  "private": true,
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.3",
-    "concurrently": "^4.1.0",
-    "express": "^4.16.4",
-    "jsonwebtoken": "^8.5.0",
-    "mongoose": "^5.4.15",
-    "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0",
-    "validator": "^10.11.0"
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "node-sass": "^4.11.0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-redux": "^6.0.0",
+    "react-scripts": "2.1.5",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0",
+    "serve": "^10.1.2",
+    "uuid": "^3.3.2"
   },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:5000",
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
   "devDependencies": {
-    "nodemon": "^1.18.10"
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "1.15.3",
+    "redux-devtools": "^3.5.0",
+    "redux-devtools-extension": "^2.13.7"
   }
 }
